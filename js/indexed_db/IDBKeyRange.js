@@ -10,6 +10,9 @@
  *     static IDBKeyRange bound (any lower, any upper, optional boolean lowerOpen, optional boolean upperOpen);
  * };
  */
+/**
+ * @constructor
+ */
 var IDBKeyRange = function () {};
 
 /**
@@ -64,3 +67,4 @@ IDBKeyRange.upperBound = function (upper, open) { return new IDBKeyRange(); };
  * @returns {IDBKeyRange}
  */
 IDBKeyRange.bound = function (lower, upper, lowerOpen, upperOpen) { return new IDBKeyRange(); };
+

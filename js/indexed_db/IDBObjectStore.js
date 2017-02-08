@@ -17,6 +17,9 @@
  *     IDBRequest count (optional any key);
  * };
  */
+/**
+ * @constructor
+ */
 var IDBObjectStore = function () {};
 
 /**
@@ -112,3 +115,4 @@ IDBObjectStore.prototype.deleteIndex = function (indexName) { return ; };
  * @returns {IDBRequest}
  */
 IDBObjectStore.prototype.count = function (key) { return new IDBRequest(); };
+

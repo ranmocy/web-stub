@@ -282,7 +282,7 @@ function convertEnum(definition) {
 }
 
 function convertDictField(dict_name, field) {
-  return `${dict_name}.${field.name} = ${getDefaultValueOfDefault(field.default)},`;
+  return `${dict_name}.${field.name} = ${getDefaultValueOfDefault(field.default)};`;
 }
 
 function convertDict(definition) {
@@ -293,9 +293,9 @@ function convertDict(definition) {
   let result = [`const ${definition.name} = {};`];
   if (definition.inheritance) {
     assert(typeof(definition.inheritance) === 'string');
-    result.push(`${definition.name}.prototype = ${definition.inheritance}`);
+    result.push(`${definition.name}.prototype = ${definition.inheritance};`);
   }
-  result.push(definition.members.map((member) => {
+  result = result.concat(definition.members.map((member) => {
     switch (member.type) {
       case 'field': {
         return convertDictField(definition.name, member);
@@ -305,7 +305,6 @@ function convertDict(definition) {
       }
     }
   }));
-  result.push(`};`);
 
   return result.join("\n");
 }
@@ -322,12 +321,8 @@ function convertFile(source_path, target_path) {
   assert(target_path.endsWith(".js"));
 
   let result = fs.readFileSync(source_path, 'utf8').split("\n\n").map(idl_str => {
-    console.log("==================================================");
-    console.log(idl_str);
-    console.log("==================================================");
-
     let definition = WebIDL2.parse(idl_str);
-    assert(definition.length === 1);
+    assert(definition.length === 1, definition.length);
     definition = definition[0];
 
     let doc = getDocFromLines(idl_str.split("\n"));
@@ -353,7 +348,6 @@ function convertFile(source_path, target_path) {
         fail("Un-supported type:" + definition.type, definition);
       }
     }
-    console.log(doc + str + "\n");
     return doc + str + "\n";
   });
 

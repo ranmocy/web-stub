@@ -10,6 +10,9 @@
  *                     attribute EventHandler       onerror;
  * };
  */
+/**
+ * @constructor
+ */
 var IDBTransaction = function () {};
 IDBTransaction.prototype = new EventTarget();
 
@@ -56,3 +59,4 @@ IDBTransaction.prototype.oncomplete = new EventHandler();
  * @type {EventHandler}
  */
 IDBTransaction.prototype.onerror = new EventHandler();
+

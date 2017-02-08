@@ -4,6 +4,9 @@
  *                 attribute EventHandler onupgradeneeded;
  * };
  */
+/**
+ * @constructor
+ */
 var IDBOpenDBRequest = function () {};
 IDBOpenDBRequest.prototype = new IDBRequest();
 
@@ -16,3 +19,4 @@ IDBOpenDBRequest.prototype.onblocked = new EventHandler();
  * @type {EventHandler}
  */
 IDBOpenDBRequest.prototype.onupgradeneeded = new EventHandler();
+

@@ -12,6 +12,9 @@
  *     IDBRequest count (optional any key);
  * };
  */
+/**
+ * @constructor
+ */
 var IDBIndex = function () {};
 
 /**
@@ -75,3 +78,4 @@ IDBIndex.prototype.getKey = function (key) { return new IDBRequest(); };
  * @returns {IDBRequest}
  */
 IDBIndex.prototype.count = function (key) { return new IDBRequest(); };
+

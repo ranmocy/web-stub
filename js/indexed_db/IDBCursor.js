@@ -10,6 +10,9 @@
  *     IDBRequest delete ();
  * };
  */
+/**
+ * @constructor
+ */
 var IDBCursor = function () {};
 
 /**
@@ -58,3 +61,4 @@ IDBCursor.prototype.continue = function (key) { return ; };
  * @returns {IDBRequest}
  */
 IDBCursor.prototype.delete = function () { return new IDBRequest(); };
+

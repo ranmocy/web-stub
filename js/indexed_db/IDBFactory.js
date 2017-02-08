@@ -5,6 +5,9 @@
  *     short            cmp (any first, any second);
  * };
  */
+/**
+ * @constructor
+ */
 var IDBFactory = function () {};
 
 /**
@@ -26,3 +29,4 @@ IDBFactory.prototype.deleteDatabase = function (name) { return new IDBOpenDBRequ
  * @returns {number}
  */
 IDBFactory.prototype.cmp = function (first, second) { return 0; };
+

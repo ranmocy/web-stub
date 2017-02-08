@@ -12,6 +12,9 @@
  *                     attribute EventHandler       onversionchange;
  * };
  */
+/**
+ * @constructor
+ */
 var IDBDatabase = function () {};
 IDBDatabase.prototype = new EventTarget();
 
@@ -72,3 +75,4 @@ IDBDatabase.prototype.onerror = new EventHandler();
  * @type {EventHandler}
  */
 IDBDatabase.prototype.onversionchange = new EventHandler();
+

@@ -9,6 +9,9 @@
  *                 attribute EventHandler                               onerror;
  * };
  */
+/**
+ * @constructor
+ */
 var IDBRequest = function () {};
 IDBRequest.prototype = new EventTarget();
 
@@ -51,3 +54,4 @@ IDBRequest.prototype.onsuccess = new EventHandler();
  * @type {EventHandler}
  */
 IDBRequest.prototype.onerror = new EventHandler();
+
