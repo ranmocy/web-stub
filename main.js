@@ -62,6 +62,28 @@ function getDefaultValueOfType(type) {
 }
 
 /**
+ * @returns "some_string"
+ */
+function getDefaultValueOfDefault(default_def) {
+  assert(typeof(default_def) !== 'undefined');
+  switch (default_def.type) {
+    case 'string': {
+      return `'${default_def.value}'`;
+    }
+    case 'number':
+    case 'boolean': {
+      return default_def.value;
+    }
+    case 'null': {
+      return null;
+    }
+    default: {
+      fail("Un-supported arg default type:" + default_def.type, default_def);
+    }
+  }
+}
+
+/**
  * @returns "string"
  */
 function getTypePlainName(idlType) {
@@ -111,16 +133,7 @@ function getArgInDoc(arg) {
   assert(!arg.variadic);
   let doc = arg.name;
   if (typeof(arg.default) !== 'undefined') {
-    switch (arg.default.type) {
-      case 'string':
-      case 'boolean': {
-        doc += `='${arg.default.value}'`;
-        break;
-      }
-      default: {
-        fail("Un-supported arg default type:" + arg.default.type, arg);
-      }
-    }
+    doc += `=${getDefaultValueOfDefault(arg.default)}`;
   }
   if (arg.optional) {
     doc = `[${doc}]`;
@@ -133,7 +146,7 @@ function getArgInDoc(arg) {
     }));
 }
 
-function convertMemberAttribute(parent, member) {
+function convertInterfaceAttribute(parent, member) {
   assert(!member.static);
   assert(!member.stringifier);
   assert(!member.inherit);
@@ -155,7 +168,7 @@ function convertMemberAttribute(parent, member) {
   return result.join("");
 }
 
-function convertMemberOperation(parent, member) {
+function convertInterfaceOperation(parent, member) {
   /**
    * @param {*} [key]
    * @returns {void}
@@ -215,10 +228,10 @@ function convertInterface(definition) {
     definition.members.map(member => {
       switch (member.type) {
         case 'attribute': {
-          return convertMemberAttribute(parent_name, member);
+          return convertInterfaceAttribute(parent_name, member);
         }
         case 'operation': {
-          return convertMemberOperation(parent_name, member);
+          return convertInterfaceOperation(parent_name, member);
         }
         default:
           fail("Un-supported member type:" + member.type, member);
@@ -229,13 +242,43 @@ function convertInterface(definition) {
 function convertEnum(definition) {
   assert(definition.extAttrs.length === 0);
 
-  let result = [`const ${definition.name} = {`];
-  result = result.concat(definition.values.map((value) => {
-    return `  ${value}: "${value}",`;
+  // TODO: add jsdoc
+  let result = [`const ${definition.name} = {`]
+    .concat(definition.values.map((value) => {
+      return `  ${value}: "${value}",`;
+    }))
+    .concat(`};`);
+
+  return result.join("\n");
+}
+
+function convertDictField(parent, field) {
+  return `${parent}.${field.name} = ${getDefaultValueOfDefault(field.default)},`;
+}
+
+function convertDict(definition) {
+  assert(!definition.partial);
+  assert(definition.extAttrs.length === 0);
+
+  // TODO: add jsdoc
+  let result = [`const ${definition.name} = {};`];
+  if (definition.inheritance) {
+    assert(typeof(definition.inheritance) === 'string');
+    result.push(`${definition.name}.prototype = ${definition.inheritance}`);
+  }
+  result.push(definition.members.map((member) => {
+    switch (member.type) {
+      case 'field': {
+        return convertDictField(definition.name, member);
+      }
+      default: {
+        fail("Un-supported dict member type" + member.type, member);
+      }
+    }
   }));
   result.push(`};`);
 
-  return result.join("\n") + "\n";
+  return result.join("\n");
 }
 
 function convertFile(source_path, target_path) {
@@ -243,6 +286,10 @@ function convertFile(source_path, target_path) {
   assert(target_path.endsWith(".js"));
 
   let result = fs.readFileSync(source_path, 'utf8').split("\n\n").map(idl_str => {
+    console.log("==================================================");
+    console.log(idl_str);
+    console.log("==================================================");
+
     let definition = WebIDL2.parse(idl_str);
     assert(definition.length === 1);
     definition = definition[0];
@@ -256,6 +303,10 @@ function convertFile(source_path, target_path) {
       }
       case 'enum': {
         str = convertEnum(definition);
+        break;
+      }
+      case 'dictionary': {
+        str = convertDict(definition);
         break;
       }
       default: {
