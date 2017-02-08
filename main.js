@@ -320,7 +320,7 @@ function convertFile(source_path, target_path) {
   fs.writeFileSync(target_path, result.join("\n\n") + "\n");
 }
 
-function convertDir(source_root, target_root) {
+function convertDir(source_root, target_root, ignore_error) {
   assert(fs.lstatSync(source_root).isDirectory());
   if (!fs.existsSync(target_root)) {
     fs.mkdirSync(target_root, 0766);
@@ -333,7 +333,15 @@ function convertDir(source_root, target_root) {
     let target = `${target_root}/${child}`;
     let source_stat = fs.lstatSync(source);
     if (source_stat.isFile()) {
-      convertFile(source, target.replace(".webidl", ".js"));
+      try {
+        convertFile(source, target.replace(".webidl", ".js"));
+      } catch (e) {
+        if (ignore_error) {
+          console.log(e);
+        } else {
+          throw e;
+        }
+      }
     } else if (source_stat.isDirectory()) {
       convertDir(source, target);
     } else {
@@ -357,10 +365,18 @@ function updateIDL() {
 
 // ================ Main ===============
 const process = require('process');
-if (process.argv[process.argv.length - 1] === 'update') {
-  updateIDL();
-} else {
-  convertDir('idl', 'js');
+let cmd = process.argv[process.argv.length - 1];
+switch (cmd) {
+  case 'update': {
+    updateIDL();
+    break;
+  }
+  case 'all': {
+    convertDir('idl', 'js', 'ignore_error');
+    break;
+  }
+  default:
+    convertDir('idl', 'js');
 }
 
 // =============== Test ==============

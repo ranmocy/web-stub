@@ -22,3 +22,10 @@ To generate JS files from WebIDL:
 ```bash
 node .
 ```
+
+To test:
+```bash
+node . all
+git diff
+```
+Should be empty result.
