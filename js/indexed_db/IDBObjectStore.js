@@ -89,7 +89,7 @@ IDBObjectStore.prototype.openCursor = function (range, direction) { return new I
 
 /**
  * @param {string} name
- * @param {string|string[]} keyPath
+ * @param {(string|string[])} keyPath
  * @param {IDBIndexParameters} [optionalParameters]
  * @returns {IDBIndex}
  */

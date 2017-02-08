@@ -13,7 +13,7 @@
 var IDBCursor = function () {};
 
 /**
- * @type {IDBObjectStore|IDBIndex}
+ * @type {(IDBObjectStore|IDBIndex)}
  * @readonly
  */
 IDBCursor.prototype.source = null;

@@ -47,7 +47,7 @@ IDBDatabase.prototype.createObjectStore = function (name, optionalParameters) { 
 IDBDatabase.prototype.deleteObjectStore = function (name) { return ; };
 
 /**
- * @param {string|string[]} storeNames
+ * @param {(string|string[])} storeNames
  * @param {IDBTransactionMode} [mode='readonly']
  * @returns {IDBTransaction}
  */

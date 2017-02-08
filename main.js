@@ -243,10 +243,6 @@ function convertDir(source_root, target_root) {
     let target = `${target_root}/${child}`;
     let source_stat = fs.lstatSync(source);
     if (source_stat.isFile()) {
-      if (child !== 'IDBRequest.webidl') {
-        console.log("DEBUG");
-        return;
-      }
       convertFile(source, target.replace(".webidl", ".js"));
     } else if (source_stat.isDirectory()) {
       convertDir(source, target);
