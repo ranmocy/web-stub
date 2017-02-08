@@ -151,7 +151,6 @@ function convertMemberOperation(parent, member) {
   assert(!member.creator);
   assert(!member.deleter);
   assert(!member.legacycaller);
-  assert(!member.static);
   assert(!member.stringifier);
   assert(member.extAttrs.length === 0);
   if (parent === null) {
