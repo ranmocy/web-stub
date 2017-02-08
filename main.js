@@ -215,7 +215,7 @@ function convertEnum(definition) {
 
   let result = [`const ${definition.name} = {`];
   result = result.concat(definition.values.map((value) => {
-    return `  ${value}: "${value}";`;
+    return `  ${value}: "${value}",`;
   }));
   result.push(`};`);
 
