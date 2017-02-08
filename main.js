@@ -48,6 +48,7 @@ function getDefaultValueObj(idlType) {
  * @returns "[new TargetClass()]"
  */
 function getDefaultValueOfType(type) {
+  assert(type);
   assert(!type.array);
 
   if (type.nullable || type.union) {
@@ -150,12 +151,12 @@ function getArgInDoc(arg) {
  * @returns doc "@type {(string|string[])} attr_name"
  * @returns body "Target.prototype.attr_name = 'default_value';"
  */
-function convertInterfaceAttribute(parent, member) {
+function convertInterfaceAttribute(interface_name, member) {
   assert(!member.static);
   assert(!member.stringifier);
   assert(!member.inherit);
   assert(member.extAttrs.length === 0);
-  if (parent == null) {
+  if (interface_name == null) {
     assert(!member.static);
   }
 
@@ -165,14 +166,30 @@ function convertInterfaceAttribute(parent, member) {
     (member.readonly ? "@readonly" : null),
   ];
   result.push(getDocFromLines(doc_lines));
-  if (parent !== null) {
-    result.push(`${parent}${member.static ? '' : '.prototype'}.`);
+  if (interface_name !== null) {
+    result.push(`${interface_name}${member.static ? '' : '.prototype'}.`);
   }
   result.push(`${member.name} = ${getDefaultValueOfType(member.idlType)};`);
   return result.join("");
 }
 
-function convertInterfaceOperation(parent, member) {
+/**
+ * @returns "<name> = function (arg1, arg2) { return default_value; };"
+ */
+function getFunction(name, args, return_type) {
+  let result = [];
+  result.push(`${name} = function (`);
+  result.push(args.map(arg => { return arg.name; }).join(", "));
+  result.push(`) {`);
+  if (return_type !== null) {
+    result.push(` return ${getDefaultValueOfType(return_type)}; `);
+  }
+  result.push(`};`);
+
+  return result.join("");
+}
+
+function convertInterfaceOperation(interface_name, member) {
   assert(!member.getter);
   assert(!member.setter);
   assert(!member.creator);
@@ -180,25 +197,32 @@ function convertInterfaceOperation(parent, member) {
   assert(!member.legacycaller);
   assert(!member.stringifier);
   assert(member.extAttrs.length === 0);
-  if (parent === null) {
+  if (interface_name === null) {
     assert(!member.static);
   }
 
-  let doc_lines = member.arguments.map(getArgInDoc).concat([
-    `@returns {${getTypeInDoc(member.idlType)}}`
-  ]);
+  let doc_lines = member.arguments.map(getArgInDoc)
+    .concat(`@returns {${getTypeInDoc(member.idlType)}}`);
   return getDocFromLines(doc_lines) +
-    `${parent}${member.static ? '' : '.prototype'}.${member.name}` +
-    ` = function (` +
-    member.arguments.map(arg => { return arg.name; }).join(", ") +
-    `) { return ${getDefaultValueOfType(member.idlType)}; };`;
+    getFunction(`${interface_name}${member.static ? '' : '.prototype'}.${member.name}`,
+                member.arguments,
+                member.idlType);
+}
+
+function convertInterfaceConstructor(interface_name, args) {
+  let doc_lines = ["@constructor"];
+  if (args) {
+    doc_lines = doc_lines.concat(args.map(getArgInDoc));
+  }
+  return getDocFromLines(doc_lines) +
+    getFunction(`var ${interface_name}`, args, null/*return_type*/);
 }
 
 function convertInterface(definition) {
   assert(!definition.partial);
 
   let no_interface_object = false;
-  let constructor_arguments = null;
+  let constructor_arguments = [];
   definition.extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'NoInterfaceObject': {
@@ -216,12 +240,13 @@ function convertInterface(definition) {
   });
 
   let result = [];
-  let parent_name = definition.name;
+  let interface_name = definition.name;
 
   if (no_interface_object) {
-    parent_name = null;
+    assert(constructor_arguments.length === 0);
+    interface_name = null;
   } else {
-    result.push(`var ${definition.name} = function () {};`);
+    result.push(convertInterfaceConstructor(definition.name, constructor_arguments));
     if (definition.inheritance !== null) {
       result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
     }
@@ -232,10 +257,10 @@ function convertInterface(definition) {
     definition.members.map(member => {
       switch (member.type) {
         case 'attribute': {
-          return convertInterfaceAttribute(parent_name, member);
+          return convertInterfaceAttribute(interface_name, member);
         }
         case 'operation': {
-          return convertInterfaceOperation(parent_name, member);
+          return convertInterfaceOperation(interface_name, member);
         }
         default:
           fail("Un-supported member type:" + member.type, member);
@@ -256,8 +281,8 @@ function convertEnum(definition) {
   return result.join("\n");
 }
 
-function convertDictField(parent, field) {
-  return `${parent}.${field.name} = ${getDefaultValueOfDefault(field.default)},`;
+function convertDictField(dict_name, field) {
+  return `${dict_name}.${field.name} = ${getDefaultValueOfDefault(field.default)},`;
 }
 
 function convertDict(definition) {
