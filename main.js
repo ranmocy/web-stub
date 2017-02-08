@@ -39,7 +39,7 @@ function getDefaultValueObj(idlType) {
 /**
  * @returns "[new TargetClass()]"
  */
-function getDefaultValue(type) {
+function getDefaultValueOfType(type) {
   assert(!type.array);
 
   if (type.nullable || type.union) {
@@ -103,8 +103,16 @@ function getArgInDoc(arg) {
   assert(!arg.variadic);
   let name = arg.name;
   if (typeof(arg.default) !== 'undefined') {
-    assert(arg.default.type === 'string');
-    name += `='${arg.default.value}'`;
+    switch (arg.default.type) {
+      case 'string':
+      case 'boolean': {
+        name += `='${arg.default.value}'`;
+        break;
+      }
+      default: {
+        throw "Un-supported arg default type:" + arg.default.type;
+      }
+    }
   }
   if (arg.optional) {
     name = `[${name}]`;
@@ -135,7 +143,7 @@ function convertMemberAttribute(parent, member) {
   if (parent !== null) {
     result.push(`${parent}${member.static ? '' : '.prototype'}.`);
   }
-  result.push(`${member.name} = ${getDefaultValue(member.idlType)};`);
+  result.push(`${member.name} = ${getDefaultValueOfType(member.idlType)};`);
   return result.join("");
 }
 
@@ -166,7 +174,7 @@ function convertMemberOperation(parent, member) {
     `${parent}${member.static ? '' : '.prototype'}.${member.name}` +
     ` = function (` +
     member.arguments.map(arg => { return arg.name; }).join(", ") +
-    `) { return ${getDefaultValue(member.idlType)}; };`;
+    `) { return ${getDefaultValueOfType(member.idlType)}; };`;
 }
 
 function convertInterface(definition) {
