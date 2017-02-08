@@ -40,9 +40,9 @@ function getDefaultValueObj(idlType) {
  * @returns "[new TargetClass()]"
  */
 function getDefaultValue(type) {
-  assert(!type.nullable);
   assert(!type.array);
-  if (type.union) {
+
+  if (type.nullable || type.union) {
     return 'null';
   }
   assert(typeof type.idlType === 'string');
@@ -78,20 +78,22 @@ function getTypePlainName(idlType) {
 function getTypeInDoc(type) {
   // String indicating the generic type (e.g. "Promise", "sequence"). null otherwise.
   // assert(type.generic === null);
-  assert(!type.nullable);
   assert(!type.array);
+
+  let result = type.nullable ? "?" : "";
   if (type.union) {
     assert(!type.sequence);
     assert(type.generic === null);
     assert((typeof(type.default) === 'undefined'));
     assert(Array.isArray(type.idlType));
-    return type.idlType.map(getTypeInDoc).join("|");
-  }
-  if (type.sequence) {
+    result += "(" + type.idlType.map(getTypeInDoc).join("|") + ")";
+  } else if (type.sequence) {
     assert(type.generic === 'sequence');
-    return getTypeInDoc(type.idlType) + '[]';
+    result += getTypeInDoc(type.idlType) + '[]';
+  } else {
+    result += getTypePlainName(type.idlType);
   }
-  return getTypePlainName(type.idlType);
+  return result;
 }
 
 /**
@@ -241,10 +243,10 @@ function convertDir(source_root, target_root) {
     let target = `${target_root}/${child}`;
     let source_stat = fs.lstatSync(source);
     if (source_stat.isFile()) {
-      // if (child !== 'IDBIndex.webidl') {
-      //   console.log("DEBUG");
-      //   return;
-      // }
+      if (child !== 'IDBRequest.webidl') {
+        console.log("DEBUG");
+        return;
+      }
       convertFile(source, target.replace(".webidl", ".js"));
     } else if (source_stat.isDirectory()) {
       convertDir(source, target);
