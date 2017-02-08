@@ -9,7 +9,7 @@ interface IDBObjectStore {
     IDBRequest delete (any key);
     IDBRequest get (any key);
     IDBRequest clear ();
-    IDBRequest openCursor (optional any? range, optional IDBCursorDirection direction = "next");
+    IDBRequest openCursor (optional any range, optional IDBCursorDirection direction = "next");
     IDBIndex   createIndex (DOMString name, (DOMString or sequence<DOMString>) keyPath, optional IDBIndexParameters optionalParameters);
     IDBIndex   index (DOMString name);
     void       deleteIndex (DOMString indexName);
