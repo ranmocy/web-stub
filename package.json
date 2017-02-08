@@ -1,0 +1,26 @@
+{
+  "name": "web-interface",
+  "version": "0.0.1",
+  "description": "Generate placeholder for IDE from WebIDL",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ranmocy/web-interface.git"
+  },
+  "keywords": [
+    "IDE",
+    "WebIDL"
+  ],
+  "author": "Ranmocy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ranmocy/web-interface/issues"
+  },
+  "homepage": "https://github.com/ranmocy/web-interface#readme",
+  "dependencies": {
+    "webidl2": "2.2.2"
+  }
+}
