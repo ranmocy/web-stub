@@ -27,6 +27,8 @@ function getDefaultValueObj(idlType) {
     case 'unsigned long':
     case 'unsigned long long':
       return '0';
+    case 'boolean':
+      return false;
     case 'DOMString':
       return '""';
     default:
@@ -245,7 +247,7 @@ fs.readdir(SOURCE, (err, folders) => {
       files.forEach(file => {
         assert(file.endsWith(".webidl"));
         console.log(file);
-        if (file !== 'IDBEnvironment.webidl') {
+        if (file !== 'IDBIndex.webidl') {
           // console.log("DEBUG");
           // return;
         }
