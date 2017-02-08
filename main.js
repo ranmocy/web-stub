@@ -23,7 +23,7 @@ function getDefaultValueObj(idlType) {
       return '{}';
     case 'void':
       return '';
-    case 'unsigned int':
+    case 'short':
     case 'unsigned long':
     case 'unsigned long long':
       return '0';
@@ -59,7 +59,7 @@ function getTypePlainName(idlType) {
   switch (idlType) {
     case 'any':
       return '*';
-    case 'unsigned int':
+    case 'short':
     case 'unsigned long':
     case 'unsigned long long':
       return 'number';
@@ -246,8 +246,8 @@ fs.readdir(SOURCE, (err, folders) => {
         assert(file.endsWith(".webidl"));
         console.log(file);
         if (file !== 'IDBEnvironment.webidl') {
-          console.log("DEBUG");
-          return;
+          // console.log("DEBUG");
+          // return;
         }
         convertFile(`${SOURCE}/${folder}/${file}`,
                     `${TARGET}/${folder}/${file.replace(".webidl", ".js")}`);
