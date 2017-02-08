@@ -1,7 +1,9 @@
 {
   "predef": [
     "document",
-    "window"
+    "window",
+    "require",
+    "exports"
   ],
   "browser": true,
   "boss": true,

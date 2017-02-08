@@ -1,6 +1,14 @@
 const WebIDL2 = require("webidl2");
 const fs = require('fs');
-const assert = require('assert');
+const assert_ext = require('assert');
+
+function assert(condition, obj) {
+  assert_ext(condition, JSON.stringify(obj));
+}
+
+function fail(msg, obj) {
+  assert_ext(false, msg + ", " + JSON.stringify(obj));
+}
 
 /**
  * @param {string[]} lines
@@ -80,20 +88,20 @@ function getTypeInDoc(type) {
   // assert(type.generic === null);
   assert(!type.array);
 
-  let result = type.nullable ? "?" : "";
+  let doc = type.nullable ? "?" : "";
   if (type.union) {
     assert(!type.sequence);
     assert(type.generic === null);
     assert((typeof(type.default) === 'undefined'));
     assert(Array.isArray(type.idlType));
-    result += "(" + type.idlType.map(getTypeInDoc).join("|") + ")";
+    doc += "(" + type.idlType.map(getTypeInDoc).join("|") + ")";
   } else if (type.sequence) {
     assert(type.generic === 'sequence');
-    result += getTypeInDoc(type.idlType) + '[]';
+    doc += getTypeInDoc(type.idlType) + '[]';
   } else {
-    result += getTypePlainName(type.idlType);
+    doc += getTypePlainName(type.idlType);
   }
-  return result;
+  return doc;
 }
 
 /**
@@ -101,24 +109,24 @@ function getTypeInDoc(type) {
  */
 function getArgInDoc(arg) {
   assert(!arg.variadic);
-  let name = arg.name;
+  let doc = arg.name;
   if (typeof(arg.default) !== 'undefined') {
     switch (arg.default.type) {
       case 'string':
       case 'boolean': {
-        name += `='${arg.default.value}'`;
+        doc += `='${arg.default.value}'`;
         break;
       }
       default: {
-        throw "Un-supported arg default type:" + arg.default.type;
+        fail("Un-supported arg default type:" + arg.default.type, arg);
       }
     }
   }
   if (arg.optional) {
-    name = `[${name}]`;
+    doc = `[${doc}]`;
   }
 
-  return `@param {${getTypeInDoc(arg.idlType)}} ${name}` +
+  return `@param {${getTypeInDoc(arg.idlType)}} ${doc}` +
     (arg.extAttrs.length === 0 ? '' : ' - ' + arg.extAttrs.map(attr => {
       assert(attr.arguments === null);
       return `${attr.name}`;
@@ -197,7 +205,7 @@ function convertInterface(definition) {
           break;
         }
         default: {
-          throw "Un-supported attr:" + attr.name;
+          fail("Un-supported attr:" + attr.name, attr);
         }
       }
     });
@@ -213,7 +221,7 @@ function convertInterface(definition) {
           return convertMemberOperation(parent_name, member);
         }
         default:
-          throw "Un-supported member type:" + member.type;
+          fail("Un-supported member type:" + member.type, member);
       }
     }).join("\n\n");
 }
@@ -234,28 +242,31 @@ function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
 
-  let idl = fs.readFileSync(source_path, 'utf8');
-  let definitions = WebIDL2.parse(idl);
-  let result = getDocFromLines(idl.split("\n")) +
-    definitions.map(definition => {
-      switch (definition.type) {
-        case 'interface': {
-          let str = convertInterface(definition);
-          console.log(str);
-          return str;
-        }
-        case 'enum': {
-          let enum_str = convertEnum(definition);
-          console.log(enum_str);
-          return enum_str;
-        }
-        default: {
-          throw "Un-supported type:" + definition.type;
-        }
+  let result = fs.readFileSync(source_path, 'utf8').split("\n\n").map(idl_str => {
+    let definition = WebIDL2.parse(idl_str);
+    assert(definition.length === 1);
+    definition = definition[0];
+
+    let doc = getDocFromLines(idl_str.split("\n"));
+    let str;
+    switch (definition.type) {
+      case 'interface': {
+        str = convertInterface(definition);
+        break;
       }
-    }) +
-    "\n";
-  fs.writeFileSync(target_path, result);
+      case 'enum': {
+        str = convertEnum(definition);
+        break;
+      }
+      default: {
+        fail("Un-supported type:" + definition.type, definition);
+      }
+    }
+    console.log(doc + str);
+    return doc + str;
+  });
+
+  fs.writeFileSync(target_path, result.join("\n\n") + "\n");
 }
 
 function convertDir(source_root, target_root) {
@@ -275,7 +286,7 @@ function convertDir(source_root, target_root) {
     } else if (source_stat.isDirectory()) {
       convertDir(source, target);
     } else {
-      throw "Un-supported file:" + source;
+      fail("Un-supported file:" + source, source_stat);
     }
   });
 }
