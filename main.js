@@ -146,6 +146,10 @@ function getArgInDoc(arg) {
     }));
 }
 
+/**
+ * @returns doc "@type {(string|string[])} attr_name"
+ * @returns body "Target.prototype.attr_name = 'default_value';"
+ */
 function convertInterfaceAttribute(parent, member) {
   assert(!member.static);
   assert(!member.stringifier);
@@ -169,14 +173,6 @@ function convertInterfaceAttribute(parent, member) {
 }
 
 function convertInterfaceOperation(parent, member) {
-  /**
-   * @param {*} [key]
-   * @returns {void}
-   */
-  /*
-  IDBCursor.prototype.continue = function (key) {};
-  */
-
   assert(!member.getter);
   assert(!member.setter);
   assert(!member.creator);
@@ -201,30 +197,38 @@ function convertInterfaceOperation(parent, member) {
 function convertInterface(definition) {
   assert(!definition.partial);
 
-  let result = "";
+  let no_interface_object = false;
+  let constructor_arguments = null;
+  definition.extAttrs.forEach(attr => {
+    switch (attr.name) {
+      case 'NoInterfaceObject': {
+        no_interface_object = true;
+        break;
+      }
+      case 'Constructor': {
+        constructor_arguments = attr.arguments;
+        break;
+      }
+      default: {
+        fail("Un-supported attr:" + attr.name, attr);
+      }
+    }
+  });
+
+  let result = [];
   let parent_name = definition.name;
 
-  if (definition.extAttrs.length === 0) {
-    result += `var ${definition.name} = function () {};\n` +
-    (definition.inheritance === null ?
-      '':
-      `${definition.name}.prototype = new ${definition.inheritance}();\n`) +
-    "\n";
+  if (no_interface_object) {
+    parent_name = null;
   } else {
-    definition.extAttrs.forEach(attr => {
-      switch (attr.name) {
-        case 'NoInterfaceObject': {
-          parent_name = null;
-          break;
-        }
-        default: {
-          fail("Un-supported attr:" + attr.name, attr);
-        }
-      }
-    });
+    result.push(`var ${definition.name} = function () {};`);
+    if (definition.inheritance !== null) {
+      result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
+    }
+    result.push("\n");
   }
 
-  return result +
+  return result.join("\n") +
     definition.members.map(member => {
       switch (member.type) {
         case 'attribute': {
@@ -313,8 +317,8 @@ function convertFile(source_path, target_path) {
         fail("Un-supported type:" + definition.type, definition);
       }
     }
-    console.log(doc + str);
-    return doc + str;
+    console.log(doc + str + "\n");
+    return doc + str + "\n";
   });
 
   fs.writeFileSync(target_path, result.join("\n\n") + "\n");
