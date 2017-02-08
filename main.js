@@ -2,7 +2,11 @@ const WebIDL2 = require("webidl2");
 const fs = require('fs');
 const assert = require('assert');
 
-function toJSDoc(lines) {
+/**
+ * @param {string[]} lines
+ * @returns JSDoc
+ */
+function getDocFromLines(lines) {
   let doc = lines
     .filter(line => (line !== null && line.length > 0))
     .map(line => { return ` * ${line}`; })
@@ -10,6 +14,9 @@ function toJSDoc(lines) {
   return `/**\n${doc}\n */\n`;
 }
 
+/**
+ * @returns "new TargetClass()"
+ */
 function getDefaultValueObj(idlType) {
   switch (idlType) {
     case 'any':
@@ -26,6 +33,10 @@ function getDefaultValueObj(idlType) {
       return `new ${idlType}()`;
   }
 }
+
+/**
+ * @returns "[new TargetClass()]"
+ */
 function getDefaultValue(type) {
   assert(!type.nullable);
   assert(!type.array);
@@ -40,7 +51,10 @@ function getDefaultValue(type) {
   return type.sequence ? `[${obj}]` : obj;
 }
 
-function getTypeDocName(idlType) {
+/**
+ * @returns "string"
+ */
+function getTypePlainName(idlType) {
   assert(typeof(idlType) === 'string');
   switch (idlType) {
     case 'any':
@@ -55,7 +69,11 @@ function getTypeDocName(idlType) {
       return idlType;
   }
 }
-function getTypeName(type) {
+
+/**
+ * @returns "string|string[]"
+ */
+function getTypeInDoc(type) {
   // String indicating the generic type (e.g. "Promise", "sequence"). null otherwise.
   // assert(type.generic === null);
   assert(!type.nullable);
@@ -65,26 +83,19 @@ function getTypeName(type) {
     assert(type.generic === null);
     assert((typeof(type.default) === 'undefined'));
     assert(Array.isArray(type.idlType));
-    return type.idlType.map(getTypeName).join("|");
+    return type.idlType.map(getTypeInDoc).join("|");
   }
   if (type.sequence) {
     assert(type.generic === 'sequence');
-    return getTypeName(type.idlType) + '[]';
+    return getTypeInDoc(type.idlType) + '[]';
   }
-  return getTypeDocName(type.idlType);
-}
-function convertTypeDoc(type) {
-  return getTypeName(type) +
-    (() => {
-      if (typeof(type.default) === 'undefined') {
-        return '';
-      }
-      assert(type.default.type === 'string');
-      return `=${type.default.value}`;
-    })();
+  return getTypePlainName(type.idlType);
 }
 
-function convertArgDoc(arg) {
+/**
+ * @returns "@param {string|string[]} storeNames"
+ */
+function getArgInDoc(arg) {
   assert(!arg.variadic);
   let name = arg.name;
   if (typeof(arg.default) !== 'undefined') {
@@ -95,74 +106,122 @@ function convertArgDoc(arg) {
     name = `[${name}]`;
   }
 
-  return `@param {${convertTypeDoc(arg.idlType)}} ${name}` +
+  return `@param {${getTypeInDoc(arg.idlType)}} ${name}` +
     (arg.extAttrs.length === 0 ? '' : ' - ' + arg.extAttrs.map(attr => {
       assert(attr.arguments === null);
       return `${attr.name}`;
     }));
 }
 
-function convertMember(parent, member) {
-  switch (member.type) {
-    case 'attribute': {
-      assert(!member.static);
-      assert(!member.stringifier);
-      assert(!member.inherit);
-      assert(member.extAttrs.length === 0);
-
-      let doc_lines = [
-        `@type {${convertTypeDoc(member.idlType)}}`,
-        (member.readonly ? "@readonly" : null),
-      ];
-      return toJSDoc(doc_lines) +
-        `${parent.name}${member.static ? '' : '.prototype'}.${member.name}` +
-        ` = ${getDefaultValue(member.idlType)};`;
-      }
-    case 'operation': {
-
-      /**
-       * @param {*} [key]
-       * @returns {void}
-       */
-      /*
-      IDBCursor.prototype.continue = function (key) {};
-      */
-
-      assert(!member.getter);
-      assert(!member.setter);
-      assert(!member.creator);
-      assert(!member.deleter);
-      assert(!member.legacycaller);
-      assert(!member.static);
-      assert(!member.stringifier);
-      assert(member.extAttrs.length === 0);
-
-      let doc_lines = member.arguments.map(convertArgDoc).concat([
-        `@returns {${convertTypeDoc(member.idlType)}}`
-      ]);
-      return toJSDoc(doc_lines) +
-        `${parent.name}${member.static ? '' : '.prototype'}.${member.name}` +
-        ` = function (` +
-        member.arguments.map(arg => { return arg.name; }).join(", ") +
-        `) { return ${getDefaultValue(member.idlType)}; };`;
-    }
-    default:
-      throw "Un-supported member type:" + member.type;
+function convertMemberAttribute(parent, member) {
+  assert(!member.static);
+  assert(!member.stringifier);
+  assert(!member.inherit);
+  assert(member.extAttrs.length === 0);
+  if (parent == null) {
+    assert(!member.static);
   }
+
+  let result = [];
+  let doc_lines = [
+    `@type {${getTypeInDoc(member.idlType)}}`,
+    (member.readonly ? "@readonly" : null),
+  ];
+  result.push(getDocFromLines(doc_lines));
+  if (parent !== null) {
+    result.push(`${parent}${member.static ? '' : '.prototype'}.`);
+  }
+  result.push(`${member.name} = ${getDefaultValue(member.idlType)};`);
+  return result.join("");
+}
+
+function convertMemberOperation(parent, member) {
+  /**
+   * @param {*} [key]
+   * @returns {void}
+   */
+  /*
+  IDBCursor.prototype.continue = function (key) {};
+  */
+
+  assert(!member.getter);
+  assert(!member.setter);
+  assert(!member.creator);
+  assert(!member.deleter);
+  assert(!member.legacycaller);
+  assert(!member.static);
+  assert(!member.stringifier);
+  assert(member.extAttrs.length === 0);
+  if (parent === null) {
+    assert(!member.static);
+  }
+
+  let doc_lines = member.arguments.map(getArgInDoc).concat([
+    `@returns {${getTypeInDoc(member.idlType)}}`
+  ]);
+  return getDocFromLines(doc_lines) +
+    `${parent}${member.static ? '' : '.prototype'}.${member.name}` +
+    ` = function (` +
+    member.arguments.map(arg => { return arg.name; }).join(", ") +
+    `) { return ${getDefaultValue(member.idlType)}; };`;
 }
 
 function convertInterface(interface) {
   assert(!interface.partial);
-  assert(interface.extAttrs.length === 0);
 
-  return `var ${interface.name} = function () {};\n` +
+  let result = "";
+  let parent_name = interface.name;
+
+  if (interface.extAttrs.length === 0) {
+    result += `var ${interface.name} = function () {};\n` +
     (interface.inheritance === null ?
       '':
       `${interface.name}.prototype = new ${interface.inheritance}();\n`) +
-    "\n" +
+    "\n";
+  } else {
+    interface.extAttrs.forEach(attr => {
+      switch (attr.name) {
+        case 'NoInterfaceObject': {
+          parent_name = null;
+          break;
+        }
+        default: {
+          throw "Un-supported attr:" + attr.name;
+        }
+      }
+    });
+  }
+
+  return result +
     interface.members.map(member => {
-      return convertMember(interface, member);
+      switch (member.type) {
+        case 'attribute': {
+          return convertMemberAttribute(parent_name, member);
+        }
+        case 'operation': {
+          return convertMemberOperation(parent_name, member);
+        }
+        default:
+          throw "Un-supported member type:" + member.type;
+      }
     }).join("\n\n");
+}
+
+function convertFile(source_path, target_path) {
+  let idl = fs.readFileSync(source_path, 'utf8');
+  let definitions = WebIDL2.parse(idl);
+  let result = getDocFromLines(idl.split("\n")) +
+    definitions.map(obj => {
+      if (obj.type === 'interface') {
+        return convertInterface(obj);
+      } else {
+        throw "Un-supported type:" + obj.type;
+      }
+    }) +
+    "\n";
+  console.log(idl);
+  console.log(result);
+  fs.writeFileSync(target_path, result);
 }
 
 
@@ -186,24 +245,19 @@ fs.readdir(SOURCE, (err, folders) => {
       files.forEach(file => {
         assert(file.endsWith(".webidl"));
         console.log(file);
-        if (file !== 'IDBDatabase.webidl') {
-          // console.log("DEBUG");
-          // return;
+        if (file !== 'IDBEnvironment.webidl') {
+          console.log("DEBUG");
+          return;
         }
-        let idl = fs.readFileSync(`${SOURCE}/${folder}/${file}`, 'utf8');
-        let definitions = WebIDL2.parse(idl);
-        let result = toJSDoc(idl.split("\n")) +
-          definitions.map(obj => {
-            if (obj.type === 'interface') {
-              return convertInterface(obj);
-            } else {
-              throw "Un-supported type:" + obj.type;
-            }
-          });
-        console.log(idl);
-        console.log(result);
-        fs.writeFileSync(`${TARGET}/${folder}/${file.replace(".webidl", ".js")}`, result);
+        convertFile(`${SOURCE}/${folder}/${file}`,
+                    `${TARGET}/${folder}/${file.replace(".webidl", ".js")}`);
       });
     });
   });
 });
+
+// =============== Test ==============
+exports.test = function(name) {
+  let idl = fs.readFileSync(`${SOURCE}/indexed_db/${name}`, 'utf8');
+  return WebIDL2.parse(idl);
+};
