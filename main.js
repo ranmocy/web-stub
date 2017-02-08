@@ -310,6 +310,13 @@ function convertDict(definition) {
   return result.join("\n");
 }
 
+function convertImpl(definition) {
+  assert(definition.extAttrs.length === 0);
+
+  // TODO: add jsdoc
+  return `${definition.target}.prototype = new ${definition.implements}();`;
+}
+
 function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
@@ -336,6 +343,10 @@ function convertFile(source_path, target_path) {
       }
       case 'dictionary': {
         str = convertDict(definition);
+        break;
+      }
+      case 'implements': {
+        str = convertImpl(definition);
         break;
       }
       default: {
