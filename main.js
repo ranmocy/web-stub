@@ -209,6 +209,9 @@ function convertInterface(interface) {
 }
 
 function convertFile(source_path, target_path) {
+  assert(source_path.endsWith(".webidl"));
+  assert(target_path.endsWith(".js"));
+
   let idl = fs.readFileSync(source_path, 'utf8');
   let definitions = WebIDL2.parse(idl);
   let result = getDocFromLines(idl.split("\n")) +
@@ -225,40 +228,55 @@ function convertFile(source_path, target_path) {
   fs.writeFileSync(target_path, result);
 }
 
+function convertDir(source_root, target_root) {
+  assert(fs.lstatSync(source_root).isDirectory());
+  if (!fs.existsSync(target_root)) {
+    fs.mkdirSync(target_root, 0766);
+  }
 
-// ================ Main ===============
-const SOURCE = 'idl';
-const TARGET = 'js';
-
-if (!fs.existsSync(TARGET)) {
-  fs.mkdirSync(TARGET, 0766);
+  let children = fs.readdirSync(source_root);
+  children.forEach(child => {
+    console.log('scan', child);
+    let source = `${source_root}/${child}`;
+    let target = `${target_root}/${child}`;
+    let source_stat = fs.lstatSync(source);
+    if (source_stat.isFile()) {
+      // if (child !== 'IDBIndex.webidl') {
+      //   console.log("DEBUG");
+      //   return;
+      // }
+      convertFile(source, target.replace(".webidl", ".js"));
+    } else if (source_stat.isDirectory()) {
+      convertDir(source, target);
+    } else {
+      throw "Un-supported file:" + source;
+    }
+  });
 }
 
-fs.readdir(SOURCE, (err, folders) => {
-  folders.forEach(folder => {
-    console.log(folder);
-    let target_folder = `${TARGET}/${folder}`;
-    if (!fs.existsSync(target_folder)) {
-      fs.mkdirSync(target_folder, 0766);
-    }
+const exec = require( 'child_process' ).exec;
+const URL_TO_IDL = {
+  "https://www.w3.org/TR/IndexedDB/" : "idl/IndexedDB.webidl"
+};
+function updateIDL() {
+  for (let url of Object.keys(URL_TO_IDL)) {
+    let path = URL_TO_IDL[url];
+    console.log('update', url, '=>', path);
+    exec(`curl ${url} | node_modules/webidl-extract/cli.js > ${path}`);
+  }
+}
 
-    fs.readdir(`${SOURCE}/${folder}`, (err, files) => {
-      files.forEach(file => {
-        assert(file.endsWith(".webidl"));
-        console.log(file);
-        if (file !== 'IDBIndex.webidl') {
-          // console.log("DEBUG");
-          // return;
-        }
-        convertFile(`${SOURCE}/${folder}/${file}`,
-                    `${TARGET}/${folder}/${file.replace(".webidl", ".js")}`);
-      });
-    });
-  });
-});
+
+// ================ Main ===============
+const process = require('process');
+if (process.argv[process.argv.length - 1] === 'update') {
+  updateIDL();
+} else {
+  convertDir('idl', 'js');
+}
 
 // =============== Test ==============
 exports.test = function(name) {
-  let idl = fs.readFileSync(`${SOURCE}/indexed_db/${name}`, 'utf8');
+  let idl = fs.readFileSync(`idl/indexed_db/${name}`, 'utf8');
   return WebIDL2.parse(idl);
 };

@@ -11,6 +11,10 @@ npm install
 
 To get WebIDL:
 ```bash
+node . update
+```
+Or manually:
+```bash
 curl https://www.w3.org/TR/IndexedDB/ | node_modules/webidl-extract/cli.js > idl/IndexedDB.webidl
 ```
 
