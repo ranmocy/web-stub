@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/ranmocy/web-interface#readme",
   "dependencies": {
-    "webidl2": "2.2.2"
+    "webidl2": "2.2.2",
+    "webidl-extract": "1.0.1"
   }
 }
