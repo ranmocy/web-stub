@@ -169,20 +169,20 @@ function convertMemberOperation(parent, member) {
     `) { return ${getDefaultValue(member.idlType)}; };`;
 }
 
-function convertInterface(interface) {
-  assert(!interface.partial);
+function convertInterface(definition) {
+  assert(!definition.partial);
 
   let result = "";
-  let parent_name = interface.name;
+  let parent_name = definition.name;
 
-  if (interface.extAttrs.length === 0) {
-    result += `var ${interface.name} = function () {};\n` +
-    (interface.inheritance === null ?
+  if (definition.extAttrs.length === 0) {
+    result += `var ${definition.name} = function () {};\n` +
+    (definition.inheritance === null ?
       '':
-      `${interface.name}.prototype = new ${interface.inheritance}();\n`) +
+      `${definition.name}.prototype = new ${definition.inheritance}();\n`) +
     "\n";
   } else {
-    interface.extAttrs.forEach(attr => {
+    definition.extAttrs.forEach(attr => {
       switch (attr.name) {
         case 'NoInterfaceObject': {
           parent_name = null;
@@ -196,7 +196,7 @@ function convertInterface(interface) {
   }
 
   return result +
-    interface.members.map(member => {
+    definition.members.map(member => {
       switch (member.type) {
         case 'attribute': {
           return convertMemberAttribute(parent_name, member);
@@ -210,6 +210,18 @@ function convertInterface(interface) {
     }).join("\n\n");
 }
 
+function convertEnum(definition) {
+  assert(definition.extAttrs.length === 0);
+
+  let result = [`const ${definition.name} = {`];
+  result = result.concat(definition.values.map((value) => {
+    return `  ${value}: "${value}";`;
+  }));
+  result.push(`};`);
+
+  return result.join("\n") + "\n";
+}
+
 function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
@@ -217,16 +229,24 @@ function convertFile(source_path, target_path) {
   let idl = fs.readFileSync(source_path, 'utf8');
   let definitions = WebIDL2.parse(idl);
   let result = getDocFromLines(idl.split("\n")) +
-    definitions.map(obj => {
-      if (obj.type === 'interface') {
-        return convertInterface(obj);
-      } else {
-        throw "Un-supported type:" + obj.type;
+    definitions.map(definition => {
+      switch (definition.type) {
+        case 'interface': {
+          let str = convertInterface(definition);
+          console.log(str);
+          return str;
+        }
+        case 'enum': {
+          let enum_str = convertEnum(definition);
+          console.log(enum_str);
+          return enum_str;
+        }
+        default: {
+          throw "Un-supported type:" + definition.type;
+        }
       }
     }) +
     "\n";
-  console.log(idl);
-  console.log(result);
   fs.writeFileSync(target_path, result);
 }
 
