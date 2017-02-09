@@ -247,59 +247,39 @@ function convertInterface(definition) {
     }
   });
 
+  let doc_lines = [];
   let result = [];
-  let interface_name = definition.name;
 
   if (no_interface_object) {
     assert(constructor_arguments.length === 0);
-    interface_name = null;
-    let doc = [
-      `@interface ${definition.name}`
-    ];
-    result.push(getDocFromLines(doc));
-    result.push(`let ${definition.name} = function () {};`);
-    result.push("\n");
-    return result.join("\n") +
-      //  TODO: generate member as the member of the interface
-      definition.members.map(member => {
-        switch (member.type) {
-          case 'attribute': {
-            return convertInterfaceAttribute(interface_name, member);
-          }
-          case 'operation': {
-            return convertInterfaceOperation(interface_name, member);
-          }
-          default:
-            fail("Un-supported member type:" + member.type, member);
-        }
-      }).join("\n\n");
+    assert(definition.inheritance === null);
+
+    doc_lines.push(`@interface ${definition.name}`);
+    result.push(`let ${definition.name} = {};`);
   } else {
-    let doc_lines = [
-      "@constructor"
-    ];
+    doc_lines.push("@constructor");
     if (constructor_arguments) {
       doc_lines = doc_lines.concat(constructor_arguments.map(getArgInDoc));
     }
-    result.push(getDocFromLines(doc_lines));
     result.push(getFunction(`let ${definition.name}`, constructor_arguments, null/*return_type*/));
-    if (definition.inheritance !== null) {
-      result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
-    }
-    result.push("\n");
-    return result.join("\n") +
-      definition.members.map(member => {
-        switch (member.type) {
-          case 'attribute': {
-            return convertInterfaceAttribute(interface_name, member);
-          }
-          case 'operation': {
-            return convertInterfaceOperation(interface_name, member);
-          }
-          default:
-            fail("Un-supported member type:" + member.type, member);
-        }
-      }).join("\n\n");
   }
+
+  if (definition.inheritance !== null) {
+    result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
+  }
+  return getDocFromLines(doc_lines) + result.join("\n") + "\n\n" +
+    definition.members.map(member => {
+      switch (member.type) {
+        case 'attribute': {
+          return convertInterfaceAttribute(definition.name, member);
+        }
+        case 'operation': {
+          return convertInterfaceOperation(definition.name, member);
+        }
+        default:
+          fail("Un-supported member type:" + member.type, member);
+      }
+    }).join("\n\n");
 }
 
 function convertEnum(definition) {

@@ -47,7 +47,6 @@ const IDBRequestReadyState = {
 /**
  * @constructor
  */
-
 let IDBKeyRange = function () {};
 
 /**
@@ -187,7 +186,6 @@ IDBVersionChangeEventInit.newVersion = null;
 /**
  * @constructor
  */
-
 let IDBRequest = function () {};
 IDBRequest.prototype = new EventTarget();
 
@@ -241,7 +239,6 @@ IDBRequest.prototype.onerror = new EventHandler();
 /**
  * @constructor
  */
-
 let IDBOpenDBRequest = function () {};
 IDBOpenDBRequest.prototype = new IDBRequest();
 
@@ -268,7 +265,6 @@ IDBOpenDBRequest.prototype.onupgradeneeded = new EventHandler();
  * @param {string} type
  * @param {IDBVersionChangeEventInit} [eventInitDict]
  */
-
 let IDBVersionChangeEvent = function (type, eventInitDict) {};
 IDBVersionChangeEvent.prototype = new Event();
 
@@ -312,14 +308,13 @@ WorkerUtils.prototype = IDBEnvironment.prototype;
 /**
  * @interface IDBEnvironment
  */
-
-let IDBEnvironment = function () {};
+let IDBEnvironment = {};
 
 /**
  * @type {IDBFactory}
  * @readonly
  */
-indexedDB = new IDBFactory();
+IDBEnvironment.prototype.indexedDB = new IDBFactory();
 
 
 /**
@@ -332,7 +327,6 @@ indexedDB = new IDBFactory();
 /**
  * @constructor
  */
-
 let IDBFactory = function () {};
 
 /**
@@ -373,7 +367,6 @@ IDBFactory.prototype.cmp = function (first, second) { return 0; };
 /**
  * @constructor
  */
-
 let IDBDatabase = function () {};
 IDBDatabase.prototype = new EventTarget();
 
@@ -458,7 +451,6 @@ IDBDatabase.prototype.onversionchange = new EventHandler();
 /**
  * @constructor
  */
-
 let IDBObjectStore = function () {};
 
 /**
@@ -573,7 +565,6 @@ IDBObjectStore.prototype.count = function (key) { return new IDBRequest(); };
 /**
  * @constructor
  */
-
 let IDBIndex = function () {};
 
 /**
@@ -654,7 +645,6 @@ IDBIndex.prototype.count = function (key) { return new IDBRequest(); };
 /**
  * @constructor
  */
-
 let IDBCursor = function () {};
 
 /**
@@ -713,7 +703,6 @@ IDBCursor.prototype.delete = function () { return new IDBRequest(); };
 /**
  * @constructor
  */
-
 let IDBCursorWithValue = function () {};
 IDBCursorWithValue.prototype = new IDBCursor();
 
@@ -739,7 +728,6 @@ IDBCursorWithValue.prototype.value = {};
 /**
  * @constructor
  */
-
 let IDBTransaction = function () {};
 IDBTransaction.prototype = new EventTarget();
 
