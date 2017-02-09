@@ -1,3 +1,5 @@
+"use strict";
+
 const WebIDL2 = require("webidl2");
 const fs = require('fs');
 const assert_ext = require('assert');
@@ -132,19 +134,34 @@ function getTypeInDoc(type) {
  */
 function getArgInDoc(arg) {
   assert(!arg.variadic);
-  let doc = arg.name;
+
+  let arg_name = arg.name;
   if (typeof(arg.default) !== 'undefined') {
-    doc += `=${getDefaultValueOfDefault(arg.default)}`;
+    arg_name += `=${getDefaultValueOfDefault(arg.default)}`;
   }
   if (arg.optional) {
-    doc = `[${doc}]`;
+    arg_name = `[${arg_name}]`;
   }
 
-  return `@param {${getTypeInDoc(arg.idlType)}} ${doc}` +
-    (arg.extAttrs.length === 0 ? '' : ' - ' + arg.extAttrs.map(attr => {
+  let doc = [];
+  doc.push(`@param {${getTypeInDoc(arg.idlType)}} `);
+  doc.push(arg_name);
+  if (arg.extAttrs.length > 0) {
+    doc.push(' -- ');
+    arg.extAttrs.forEach(attr => {
       assert(attr.arguments === null);
-      return `${attr.name}`;
-    }));
+      switch (attr.name) {
+        case 'EnforceRange': {
+          doc.push(attr.name);
+          break;
+        }
+        default: {
+          fail("Un-supported attr:" + attr.name, attr);
+        }
+      }
+    });
+  }
+  return doc.join("");
 }
 
 /**
@@ -288,6 +305,28 @@ function convertEnum(definition) {
   return getDocFromLines(doc) + result.join("\n");
 }
 
+/**
+ * @returns {string} -- "@property {string|string[]} storeNames"
+ */
+function getDictPropertyInDoc(property) {
+  assert(!property.required);
+  assert(property.extAttrs.length === 0);
+  assert(property.type === 'field');
+
+  let name = property.name;
+  if (typeof(property.default) !== 'undefined') {
+    name += `=${getDefaultValueOfDefault(property.default)}`;
+  }
+  if (!property.required) {
+    name = `[${name}]`;
+  }
+
+  let doc = [];
+  doc.push(`@property {${getTypeInDoc(property.idlType)}} `);
+  doc.push(name);
+  return doc.join("");
+}
+
 function convertDictField(dict_name, field) {
   return `${dict_name}.${field.name} = ${getDefaultValueOfDefault(field.default)};`;
 }
@@ -296,11 +335,14 @@ function convertDict(definition) {
   assert(!definition.partial);
   assert(definition.extAttrs.length === 0);
 
-  // TODO: add jsdoc
-  let result = [`const ${definition.name} = {};`];
+  let doc = [
+    `@typedef {Object} ${definition.name}`,
+  ].concat(definition.members.map(getDictPropertyInDoc));
+
+  let result = [`var ${definition.name} = {};`];
   if (definition.inheritance) {
     assert(typeof(definition.inheritance) === 'string');
-    result.push(`${definition.name}.prototype = ${definition.inheritance};`);
+    result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
   }
   result = result.concat(definition.members.map((member) => {
     switch (member.type) {
@@ -313,7 +355,7 @@ function convertDict(definition) {
     }
   }));
 
-  return result.join("\n");
+  return getDocFromLines(doc) + result.join("\n");
 }
 
 function convertImpl(definition) {

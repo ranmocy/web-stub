@@ -130,7 +130,12 @@ const IDBCursorDirection = {
  *     boolean                             autoIncrement = false;
  * };
  */
-const IDBObjectStoreParameters = {};
+/**
+ * @typedef {Object} IDBObjectStoreParameters
+ * @property {?(string|string[])} [keyPath=null]
+ * @property {boolean} [autoIncrement=false]
+ */
+var IDBObjectStoreParameters = {};
 IDBObjectStoreParameters.keyPath = null;
 IDBObjectStoreParameters.autoIncrement = false;
 
@@ -141,7 +146,12 @@ IDBObjectStoreParameters.autoIncrement = false;
  *     boolean multiEntry = false;
  * };
  */
-const IDBIndexParameters = {};
+/**
+ * @typedef {Object} IDBIndexParameters
+ * @property {boolean} [unique=false]
+ * @property {boolean} [multiEntry=false]
+ */
+var IDBIndexParameters = {};
 IDBIndexParameters.unique = false;
 IDBIndexParameters.multiEntry = false;
 
@@ -152,8 +162,13 @@ IDBIndexParameters.multiEntry = false;
  *     unsigned long long? newVersion = null;
  * };
  */
-const IDBVersionChangeEventInit = {};
-IDBVersionChangeEventInit.prototype = EventInit;
+/**
+ * @typedef {Object} IDBVersionChangeEventInit
+ * @property {number} [oldVersion=0]
+ * @property {?number} [newVersion=null]
+ */
+var IDBVersionChangeEventInit = {};
+IDBVersionChangeEventInit.prototype = new EventInit();
 IDBVersionChangeEventInit.oldVersion = 0;
 IDBVersionChangeEventInit.newVersion = null;
 
@@ -310,7 +325,7 @@ var IDBFactory = function () {};
 
 /**
  * @param {string} name
- * @param {number} [version] - EnforceRange
+ * @param {number} [version] -- EnforceRange
  * @returns {IDBOpenDBRequest}
  */
 IDBFactory.prototype.open = function (name, version) { return new IDBOpenDBRequest(); };
@@ -661,7 +676,7 @@ IDBCursor.prototype.primaryKey = {};
 IDBCursor.prototype.update = function (value) { return new IDBRequest(); };
 
 /**
- * @param {number} count - EnforceRange
+ * @param {number} count -- EnforceRange
  * @returns {void}
  */
 IDBCursor.prototype.advance = function (count) { return ; };
