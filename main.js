@@ -12,7 +12,7 @@ function fail(msg, obj) {
 
 /**
  * @param {string[]} lines
- * @returns JSDoc
+ * @returns {string} -- JSDoc
  */
 function getDocFromLines(lines) {
   let doc = lines
@@ -23,7 +23,7 @@ function getDocFromLines(lines) {
 }
 
 /**
- * @returns "new TargetClass()"
+ * @returns {*} -- "new TargetClass()"
  */
 function getDefaultValueObj(idlType) {
   switch (idlType) {
@@ -45,7 +45,7 @@ function getDefaultValueObj(idlType) {
 }
 
 /**
- * @returns "[new TargetClass()]"
+ * @returns {string} -- "[new TargetClass()]"
  */
 function getDefaultValueOfType(type) {
   assert(type);
@@ -59,11 +59,11 @@ function getDefaultValueOfType(type) {
     assert(!type.sequence);
   }
   let obj = getDefaultValueObj(type.idlType);
-  return type.sequence ? `[${obj}]` : obj;
+  return type.sequence ? `[${obj}]` : `${obj}`;
 }
 
 /**
- * @returns "some_string"
+ * @returns {string|number|null} "some_string"
  */
 function getDefaultValueOfDefault(default_def) {
   assert(typeof(default_def) !== 'undefined');
@@ -85,7 +85,7 @@ function getDefaultValueOfDefault(default_def) {
 }
 
 /**
- * @returns "string"
+ * @returns {string} -- "string"
  */
 function getTypePlainName(idlType) {
   assert(typeof(idlType) === 'string');
@@ -104,7 +104,7 @@ function getTypePlainName(idlType) {
 }
 
 /**
- * @returns "string|string[]"
+ * @returns {string} -- "string|string[]"
  */
 function getTypeInDoc(type) {
   // String indicating the generic type (e.g. "Promise", "sequence"). null otherwise.
@@ -128,7 +128,7 @@ function getTypeInDoc(type) {
 }
 
 /**
- * @returns "@param {string|string[]} storeNames"
+ * @returns {string} -- "@param {string|string[]} storeNames"
  */
 function getArgInDoc(arg) {
   assert(!arg.variadic);
@@ -148,8 +148,8 @@ function getArgInDoc(arg) {
 }
 
 /**
- * @returns doc "@type {(string|string[])} attr_name"
- * @returns body "Target.prototype.attr_name = 'default_value';"
+ * @returns {string} -- doc "@type {(string|string[])} attr_name"
+ *                      body "Target.prototype.attr_name = 'default_value';"
  */
 function convertInterfaceAttribute(interface_name, member) {
   assert(!member.static);
@@ -174,7 +174,7 @@ function convertInterfaceAttribute(interface_name, member) {
 }
 
 /**
- * @returns "<name> = function (arg1, arg2) { return default_value; };"
+ * @returns {string} -- "<name> = function (arg1, arg2) { return default_value; };"
  */
 function getFunction(name, args, return_type) {
   let result = [];
@@ -210,7 +210,10 @@ function convertInterfaceOperation(interface_name, member) {
 }
 
 function convertInterfaceConstructor(interface_name, args) {
-  let doc_lines = ["@constructor"];
+  let doc_lines = [
+    "@interface",
+    "@constructor"
+  ];
   if (args) {
     doc_lines = doc_lines.concat(args.map(getArgInDoc));
   }
@@ -271,14 +274,18 @@ function convertInterface(definition) {
 function convertEnum(definition) {
   assert(definition.extAttrs.length === 0);
 
-  // TODO: add jsdoc
-  let result = [`const ${definition.name} = {`]
+  let doc = [
+    "@enum",
+    "@readonly",
+  ];
+  let result = []
+    .concat(`const ${definition.name} = {`)
     .concat(definition.values.map((value) => {
       return `  ${value}: "${value}",`;
     }))
     .concat(`};`);
 
-  return result.join("\n");
+  return getDocFromLines(doc) + result.join("\n");
 }
 
 function convertDictField(dict_name, field) {
@@ -357,7 +364,7 @@ function convertFile(source_path, target_path) {
 function convertDir(source_root, target_root, ignore_error) {
   assert(fs.lstatSync(source_root).isDirectory());
   if (!fs.existsSync(target_root)) {
-    fs.mkdirSync(target_root, 0766);
+    fs.mkdirSync(target_root, 0o766);
   }
 
   let children = fs.readdirSync(source_root);
