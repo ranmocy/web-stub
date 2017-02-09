@@ -288,13 +288,19 @@ IDBVersionChangeEvent.prototype.newVersion = null;
 /**
  * Window implements IDBEnvironment;
  */
-Window.prototype = new IDBEnvironment();
+/**
+ * @implements {IDBEnvironment}
+ */
+Window.prototype = IDBEnvironment.prototype;
 
 
 /**
  * WorkerUtils implements IDBEnvironment;
  */
-WorkerUtils.prototype = new IDBEnvironment();
+/**
+ * @implements {IDBEnvironment}
+ */
+WorkerUtils.prototype = IDBEnvironment.prototype;
 
 
 /**
@@ -303,6 +309,12 @@ WorkerUtils.prototype = new IDBEnvironment();
  *     readonly    attribute IDBFactory indexedDB;
  * };
  */
+/**
+ * @interface IDBEnvironment
+ */
+
+let IDBEnvironment = function () {};
+
 /**
  * @type {IDBFactory}
  * @readonly

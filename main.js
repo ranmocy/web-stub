@@ -253,6 +253,26 @@ function convertInterface(definition) {
   if (no_interface_object) {
     assert(constructor_arguments.length === 0);
     interface_name = null;
+    let doc = [
+      `@interface ${definition.name}`
+    ];
+    result.push(getDocFromLines(doc));
+    result.push(`let ${definition.name} = function () {};`);
+    result.push("\n");
+    return result.join("\n") +
+      //  TODO: generate member as the member of the interface
+      definition.members.map(member => {
+        switch (member.type) {
+          case 'attribute': {
+            return convertInterfaceAttribute(interface_name, member);
+          }
+          case 'operation': {
+            return convertInterfaceOperation(interface_name, member);
+          }
+          default:
+            fail("Un-supported member type:" + member.type, member);
+        }
+      }).join("\n\n");
   } else {
     let doc_lines = [
       "@constructor"
@@ -266,21 +286,20 @@ function convertInterface(definition) {
       result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
     }
     result.push("\n");
+    return result.join("\n") +
+      definition.members.map(member => {
+        switch (member.type) {
+          case 'attribute': {
+            return convertInterfaceAttribute(interface_name, member);
+          }
+          case 'operation': {
+            return convertInterfaceOperation(interface_name, member);
+          }
+          default:
+            fail("Un-supported member type:" + member.type, member);
+        }
+      }).join("\n\n");
   }
-
-  return result.join("\n") +
-    definition.members.map(member => {
-      switch (member.type) {
-        case 'attribute': {
-          return convertInterfaceAttribute(interface_name, member);
-        }
-        case 'operation': {
-          return convertInterfaceOperation(interface_name, member);
-        }
-        default:
-          fail("Un-supported member type:" + member.type, member);
-      }
-    }).join("\n\n");
 }
 
 function convertEnum(definition) {
@@ -356,8 +375,11 @@ function convertDict(definition) {
 function convertImpl(definition) {
   assert(definition.extAttrs.length === 0);
 
-  // TODO: add jsdoc
-  return `${definition.target}.prototype = new ${definition.implements}();`;
+  let doc = [
+    `@implements {${definition.implements}}`
+  ];
+  return getDocFromLines(doc) +
+    `${definition.target}.prototype = ${definition.implements}.prototype;`;
 }
 
 function convertFile(source_path, target_path) {
