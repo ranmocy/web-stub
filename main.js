@@ -226,18 +226,6 @@ function convertInterfaceOperation(interface_name, member) {
                 member.idlType);
 }
 
-function convertInterfaceConstructor(interface_name, args) {
-  let doc_lines = [
-    "@interface",
-    "@constructor"
-  ];
-  if (args) {
-    doc_lines = doc_lines.concat(args.map(getArgInDoc));
-  }
-  return getDocFromLines(doc_lines) +
-    getFunction(`var ${interface_name}`, args, null/*return_type*/);
-}
-
 function convertInterface(definition) {
   assert(!definition.partial);
 
@@ -266,7 +254,14 @@ function convertInterface(definition) {
     assert(constructor_arguments.length === 0);
     interface_name = null;
   } else {
-    result.push(convertInterfaceConstructor(definition.name, constructor_arguments));
+    let doc_lines = [
+      "@constructor"
+    ];
+    if (constructor_arguments) {
+      doc_lines = doc_lines.concat(constructor_arguments.map(getArgInDoc));
+    }
+    result.push(getDocFromLines(doc_lines));
+    result.push(getFunction(`let ${definition.name}`, constructor_arguments, null/*return_type*/));
     if (definition.inheritance !== null) {
       result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
     }
@@ -339,7 +334,7 @@ function convertDict(definition) {
     `@typedef {Object} ${definition.name}`,
   ].concat(definition.members.map(getDictPropertyInDoc));
 
-  let result = [`var ${definition.name} = {};`];
+  let result = [`let ${definition.name} = {};`];
   if (definition.inheritance) {
     assert(typeof(definition.inheritance) === 'string');
     result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);

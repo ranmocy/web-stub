@@ -45,10 +45,10 @@ const IDBRequestReadyState = {
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBKeyRange = function () {};
+
+let IDBKeyRange = function () {};
 
 /**
  * @type {*}
@@ -135,7 +135,7 @@ const IDBCursorDirection = {
  * @property {?(string|string[])} [keyPath=null]
  * @property {boolean} [autoIncrement=false]
  */
-var IDBObjectStoreParameters = {};
+let IDBObjectStoreParameters = {};
 IDBObjectStoreParameters.keyPath = null;
 IDBObjectStoreParameters.autoIncrement = false;
 
@@ -151,7 +151,7 @@ IDBObjectStoreParameters.autoIncrement = false;
  * @property {boolean} [unique=false]
  * @property {boolean} [multiEntry=false]
  */
-var IDBIndexParameters = {};
+let IDBIndexParameters = {};
 IDBIndexParameters.unique = false;
 IDBIndexParameters.multiEntry = false;
 
@@ -167,7 +167,7 @@ IDBIndexParameters.multiEntry = false;
  * @property {number} [oldVersion=0]
  * @property {?number} [newVersion=null]
  */
-var IDBVersionChangeEventInit = {};
+let IDBVersionChangeEventInit = {};
 IDBVersionChangeEventInit.prototype = new EventInit();
 IDBVersionChangeEventInit.oldVersion = 0;
 IDBVersionChangeEventInit.newVersion = null;
@@ -185,10 +185,10 @@ IDBVersionChangeEventInit.newVersion = null;
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBRequest = function () {};
+
+let IDBRequest = function () {};
 IDBRequest.prototype = new EventTarget();
 
 /**
@@ -239,10 +239,10 @@ IDBRequest.prototype.onerror = new EventHandler();
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBOpenDBRequest = function () {};
+
+let IDBOpenDBRequest = function () {};
 IDBOpenDBRequest.prototype = new IDBRequest();
 
 /**
@@ -264,12 +264,12 @@ IDBOpenDBRequest.prototype.onupgradeneeded = new EventHandler();
  * };
  */
 /**
- * @interface
  * @constructor
  * @param {string} type
  * @param {IDBVersionChangeEventInit} [eventInitDict]
  */
-var IDBVersionChangeEvent = function (type, eventInitDict) {};
+
+let IDBVersionChangeEvent = function (type, eventInitDict) {};
 IDBVersionChangeEvent.prototype = new Event();
 
 /**
@@ -318,10 +318,10 @@ indexedDB = new IDBFactory();
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBFactory = function () {};
+
+let IDBFactory = function () {};
 
 /**
  * @param {string} name
@@ -359,10 +359,10 @@ IDBFactory.prototype.cmp = function (first, second) { return 0; };
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBDatabase = function () {};
+
+let IDBDatabase = function () {};
 IDBDatabase.prototype = new EventTarget();
 
 /**
@@ -444,10 +444,10 @@ IDBDatabase.prototype.onversionchange = new EventHandler();
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBObjectStore = function () {};
+
+let IDBObjectStore = function () {};
 
 /**
  * @type {string}
@@ -559,10 +559,10 @@ IDBObjectStore.prototype.count = function (key) { return new IDBRequest(); };
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBIndex = function () {};
+
+let IDBIndex = function () {};
 
 /**
  * @type {string}
@@ -640,10 +640,10 @@ IDBIndex.prototype.count = function (key) { return new IDBRequest(); };
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBCursor = function () {};
+
+let IDBCursor = function () {};
 
 /**
  * @type {(IDBObjectStore|IDBIndex)}
@@ -699,10 +699,10 @@ IDBCursor.prototype.delete = function () { return new IDBRequest(); };
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBCursorWithValue = function () {};
+
+let IDBCursorWithValue = function () {};
 IDBCursorWithValue.prototype = new IDBCursor();
 
 /**
@@ -725,10 +725,10 @@ IDBCursorWithValue.prototype.value = {};
  * };
  */
 /**
- * @interface
  * @constructor
  */
-var IDBTransaction = function () {};
+
+let IDBTransaction = function () {};
 IDBTransaction.prototype = new EventTarget();
 
 /**
