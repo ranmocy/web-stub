@@ -3,6 +3,8 @@ Generate placeholder JavaScript code and [JSDoc](http://usejsdoc.org/) from [Web
 
 Optimized for [WebStorm](https://www.jetbrains.com/webstorm/).
 
+Happy hacking!
+
 # Screenshots
 
 Method auto completion
@@ -45,3 +47,11 @@ To test: `node . all && if ! git diff-index --quiet HEAD; then exit 1; fi`
 
 1. [WebIDL2](https://github.com/w3c/webidl2.js)
 2. [webidl-extract](https://github.com/AndreasMadsen/webidl-extract)
+
+# Contribution
+
+There are ways that you can contribute to this project:
+
+1. Create Issue if you found IDE have issue about the interface. Please find the minimal code snippet that can reproduce the issue. Better with a screenshot.
+2. Provide more WebIDL that is commonly used. Please attach the link to W3C definition website like [https://www.w3.org/TR/IndexedDB/](https://www.w3.org/TR/IndexedDB/).
+3. Send pull request on main.js. It currently can not handle all cases of WebIDL. Please help me to support more WebIDLs.
