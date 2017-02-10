@@ -1,7 +1,7 @@
 # Web Interface
-Generate placeholder JavaScript code and [JSDoc](http://usejsdoc.org/) from [WebIDL](https://www.w3.org/TR/WebIDL-1/) for IDE auto-completion and type check.
+Generate placeholder JavaScript code and [JSDoc](http://usejsdoc.org/) from [WebIDL](https://www.w3.org/TR/WebIDL-1/) for IDE auto-completion and type checking.
 
-Optimized for WebStorm.
+Optimized for [WebStorm](https://www.jetbrains.com/webstorm/).
 
 # Screenshots
 
