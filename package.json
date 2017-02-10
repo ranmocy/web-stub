@@ -4,15 +4,19 @@
   "description": "Generate placeholder for IDE from WebIDL",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node . all && if ! git diff-index --quiet HEAD; then exit 1; fi"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ranmocy/web-interface.git"
   },
   "keywords": [
+    "code-generation",
+    "web",
+    "interface",
     "IDE",
-    "WebIDL"
+    "WebIDL",
+    "JavaScript"
   ],
   "author": "Ranmocy",
   "license": "MIT",
