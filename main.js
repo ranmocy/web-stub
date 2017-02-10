@@ -286,17 +286,12 @@ function convertEnum(definition) {
   assert(definition.extAttrs.length === 0);
 
   let doc = [
-    "@enum",
-    "@readonly",
+    `@typedef {` +
+    definition.values.map((value) => { return JSON.stringify(value); }).join("|") +
+    `} ${definition.name}`
   ];
-  let result = []
-    .concat(`const ${definition.name} = {`)
-    .concat(definition.values.map((value) => {
-      return `  ${value}: "${value}",`;
-    }))
-    .concat(`};`);
 
-  return getDocFromLines(doc) + result.join("\n");
+  return getDocFromLines(doc);
 }
 
 /**

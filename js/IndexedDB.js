@@ -6,14 +6,9 @@
  * };
  */
 /**
- * @enum
- * @readonly
+ * @typedef {"readonly"|"readwrite"|"versionchange"} IDBTransactionMode
  */
-const IDBTransactionMode = {
-  readonly: "readonly",
-  readwrite: "readwrite",
-  versionchange: "versionchange",
-};
+
 
 
 /**
@@ -23,13 +18,9 @@ const IDBTransactionMode = {
  * };
  */
 /**
- * @enum
- * @readonly
+ * @typedef {"pending"|"done"} IDBRequestReadyState
  */
-const IDBRequestReadyState = {
-  pending: "pending",
-  done: "done",
-};
+
 
 
 /**
@@ -112,15 +103,9 @@ IDBKeyRange.bound = function (lower, upper, lowerOpen, upperOpen) { return new I
  * };
  */
 /**
- * @enum
- * @readonly
+ * @typedef {"next"|"nextunique"|"prev"|"prevunique"} IDBCursorDirection
  */
-const IDBCursorDirection = {
-  next: "next",
-  nextunique: "nextunique",
-  prev: "prev",
-  prevunique: "prevunique",
-};
+
 
 
 /**
