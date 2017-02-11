@@ -90,7 +90,7 @@ function getDefaultValueOfDefault(default_def) {
  * @returns {string} -- "string"
  */
 function getTypePlainName(idlType) {
-  assert(typeof(idlType) === 'string');
+  assert(typeof(idlType) === 'string', idlType);
   switch (idlType) {
     case 'any':
       return '*';
@@ -121,8 +121,14 @@ function getTypeInDoc(type) {
     assert(Array.isArray(type.idlType));
     doc += "(" + type.idlType.map(getTypeInDoc).join("|") + ")";
   } else if (type.sequence) {
+    assert(!type.union);
     assert(type.generic === 'sequence');
     doc += getTypeInDoc(type.idlType) + '[]';
+  } else if (type.generic === 'record') {
+    assert(!type.union);
+    assert(!type.sequence);
+    assert(type.idlType.length === 2);
+    doc += `Object.<${getTypeInDoc(type.idlType[0])}, ${getTypeInDoc(type.idlType[1])}>`
   } else {
     doc += getTypePlainName(type.idlType);
   }
@@ -357,6 +363,16 @@ function convertImpl(definition) {
     `${definition.target}.prototype = ${definition.implements}.prototype;`;
 }
 
+function convertTypeDef(definition) {
+  assert(definition.typeExtAttrs.length === 0);
+  assert(definition.extAttrs.length === 0);
+
+  let doc = [
+    `@typedef {${getTypeInDoc(definition.idlType)}} ${definition.name}`
+  ];
+  return getDocFromLines(doc);
+}
+
 function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
@@ -365,6 +381,7 @@ function convertFile(source_path, target_path) {
     let definition = WebIDL2.parse(idl_str);
     assert(definition.length === 1, definition.length);
     definition = definition[0];
+    console.log(definition);
 
     let doc = getDocFromLines(idl_str.split("\n"));
     let str;
@@ -385,11 +402,17 @@ function convertFile(source_path, target_path) {
         str = convertImpl(definition);
         break;
       }
+      case 'typedef': {
+        str = convertTypeDef(definition);
+        break;
+      }
       default: {
         fail("Un-supported type:" + definition.type, definition);
       }
     }
-    return doc + str + "\n";
+    let definition_result = doc + str + "\n";
+    console.log(definition_result);
+    return definition_result;
   });
 
   fs.writeFileSync(target_path, result.join("\n\n") + "\n");
@@ -427,7 +450,8 @@ function convertDir(source_root, target_root, ignore_error) {
 
 const exec = require( 'child_process' ).exec;
 const URL_TO_IDL = {
-  "https://www.w3.org/TR/IndexedDB/" : "idl/IndexedDB.webidl"
+  "https://www.w3.org/TR/IndexedDB/" : "idl/IndexedDB.webidl",
+  "https://fetch.spec.whatwg.org/" : "idl/Fetch.webidl",
 };
 function updateIDL() {
   for (let url of Object.keys(URL_TO_IDL)) {
