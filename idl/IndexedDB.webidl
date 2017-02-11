@@ -147,3 +147,4 @@ interface IDBTransaction : EventTarget {
                 attribute EventHandler       oncomplete;
                 attribute EventHandler       onerror;
 };
+

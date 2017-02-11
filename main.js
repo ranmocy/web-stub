@@ -394,46 +394,46 @@ function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
 
-  let result = fs.readFileSync(source_path, 'utf8').split("\n\n").map(idl_str => {
-    if (idl_str.length === 0) {
-      return;
-    }
-    let definition = WebIDL2.parse(idl_str);
-    assert(definition.length === 1, definition.length);
-    definition = definition[0];
-    console.log(definition);
+  let result = fs.readFileSync(source_path, 'utf8')
+    .split("\n\n")
+    .filter(str => str.length > 0)
+    .map(idl_str => {
+      let definition = WebIDL2.parse(idl_str);
+      assert(definition.length === 1, definition.length);
+      definition = definition[0];
+      console.log(definition);
 
-    let doc = getDocFromLines(idl_str.split("\n"));
-    let str;
-    switch (definition.type) {
-      case 'interface': {
-        str = convertInterface(definition);
-        break;
+      let doc = getDocFromLines(idl_str.split("\n"));
+      let str;
+      switch (definition.type) {
+        case 'interface': {
+          str = convertInterface(definition);
+          break;
+        }
+        case 'enum': {
+          str = convertEnum(definition);
+          break;
+        }
+        case 'dictionary': {
+          str = convertDict(definition);
+          break;
+        }
+        case 'implements': {
+          str = convertImpl(definition);
+          break;
+        }
+        case 'typedef': {
+          str = convertTypeDef(definition);
+          break;
+        }
+        default: {
+          fail("Un-supported type:" + definition.type, definition);
+        }
       }
-      case 'enum': {
-        str = convertEnum(definition);
-        break;
-      }
-      case 'dictionary': {
-        str = convertDict(definition);
-        break;
-      }
-      case 'implements': {
-        str = convertImpl(definition);
-        break;
-      }
-      case 'typedef': {
-        str = convertTypeDef(definition);
-        break;
-      }
-      default: {
-        fail("Un-supported type:" + definition.type, definition);
-      }
-    }
-    let definition_result = doc + str + "\n";
-    console.log(definition_result);
-    return definition_result;
-  });
+      let definition_result = doc + str + "\n";
+      console.log(definition_result);
+      return definition_result;
+    });
 
   fs.writeFileSync(target_path, result.join("\n\n") + "\n");
 }
