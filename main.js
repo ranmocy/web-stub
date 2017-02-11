@@ -21,7 +21,7 @@ function getDocFromLines(lines) {
     .filter(line => (line !== null && line.length > 0))
     .map(line => { return ` * ${line}`; })
     .join("\n");
-  return `/**\n${doc}\n */\n`;
+  return `/**\n${doc}\n */`;
 }
 
 /**
@@ -179,21 +179,21 @@ function convertInterfaceAttribute(interface_name, member) {
   assert(!member.stringifier);
   assert(!member.inherit);
   assert(member.extAttrs.length === 0);
-  if (interface_name == null) {
-    assert(!member.static);
-  }
+  assert(interface_name);
 
   let result = [];
   let doc_lines = [
     `@type {${getTypeInDoc(member.idlType)}}`,
-    (member.readonly ? "@readonly" : null),
   ];
-  result.push(getDocFromLines(doc_lines));
-  if (interface_name !== null) {
-    result.push(`${interface_name}${member.static ? '' : '.prototype'}.`);
+  if (member.readonly) {
+    doc_lines.push("@readonly")
   }
-  result.push(`${member.name} = ${getDefaultValueOfType(member.idlType)};`);
-  return result.join("");
+  result.push(getDocFromLines(doc_lines));
+
+  result.push(
+    `${interface_name}${member.static ? '' : '.prototype'}.${member.name}` +
+    ` = ${getDefaultValueOfType(member.idlType)};`);
+  return result.join("\n");
 }
 
 /**
@@ -224,12 +224,17 @@ function convertInterfaceOperation(interface_name, member) {
     assert(!member.static);
   }
 
+  let result = [];
   let doc_lines = member.arguments.map(getArgInDoc)
     .concat(`@returns {${getTypeInDoc(member.idlType)}}`);
-  return getDocFromLines(doc_lines) +
-    getFunction(`${interface_name}${member.static ? '' : '.prototype'}.${member.name}`,
-                member.arguments,
-                member.idlType);
+  result.push(getDocFromLines(doc_lines));
+
+  result.push(getFunction(
+    `${interface_name}${member.static ? '' : '.prototype'}.${member.name}`,
+    member.arguments,
+    member.idlType));
+
+  return result.join("\n");
 }
 
 function convertInterface(definition) {
@@ -290,7 +295,9 @@ function convertInterface(definition) {
     result.push(`${target_class}.prototype.${definition.name} = ${definition};`);
   });
 
-  return getDocFromLines(doc_lines) + result.join("\n") + "\n\n" +
+  let interface_part = [getDocFromLines(doc_lines)].concat(result).join("\n");
+
+  let all_parts = [interface_part].concat(
     definition.members.map(member => {
       switch (member.type) {
         case 'attribute': {
@@ -299,10 +306,13 @@ function convertInterface(definition) {
         case 'operation': {
           return convertInterfaceOperation(definition.name, member);
         }
+        // TODO iterator
         default:
           fail("Un-supported member type:" + member.type, member);
       }
-    }).join("\n\n");
+    }));
+
+  return all_parts.join("\n\n");
 }
 
 function convertEnum(definition) {
@@ -347,11 +357,13 @@ function convertDict(definition) {
   assert(!definition.partial);
   assert(definition.extAttrs.length === 0);
 
-  let doc = [
+  let result = [];
+  let doc_lines = [
     `@typedef {Object} ${definition.name}`,
   ].concat(definition.members.map(getDictPropertyInDoc));
+  result.push(getDocFromLines(doc_lines));
 
-  let result = [`let ${definition.name} = {};`];
+  result.push(`let ${definition.name} = {};`);
   if (definition.inheritance) {
     assert(typeof(definition.inheritance) === 'string');
     result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
@@ -367,17 +379,21 @@ function convertDict(definition) {
     }
   }));
 
-  return getDocFromLines(doc) + result.join("\n");
+  return result.join("\n");
 }
 
 function convertImpl(definition) {
   assert(definition.extAttrs.length === 0);
 
-  let doc = [
+  let result = [];
+  let doc_lines = [
     `@implements {${definition.implements}}`
   ];
-  return getDocFromLines(doc) +
-    `${definition.target}.prototype = ${definition.implements}.prototype;`;
+  result.push(getDocFromLines(doc_lines));
+
+  result.push(`${definition.target}.prototype = ${definition.implements}.prototype;`);
+
+  return result.join("\n");
 }
 
 function convertTypeDef(definition) {
@@ -398,10 +414,12 @@ function convertFile(source_path, target_path) {
     .split("\n\n")
     .filter(str => str.length > 0)
     .map(idl_str => {
+      // console.log("==================");
+      // console.log(idl_str);
+
       let definition = WebIDL2.parse(idl_str);
       assert(definition.length === 1, definition.length);
       definition = definition[0];
-      console.log(definition);
 
       let doc = getDocFromLines(idl_str.split("\n"));
       let str;
@@ -430,8 +448,8 @@ function convertFile(source_path, target_path) {
           fail("Un-supported type:" + definition.type, definition);
         }
       }
-      let definition_result = doc + str + "\n";
-      console.log(definition_result);
+      let definition_result = doc + "\n" + str + "\n";
+      // console.log(definition_result);
       return definition_result;
     });
 

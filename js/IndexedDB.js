@@ -10,7 +10,6 @@
  */
 
 
-
 /**
  * enum IDBRequestReadyState {
  *     "pending",
@@ -20,7 +19,6 @@
 /**
  * @typedef {"pending"|"done"} IDBRequestReadyState
  */
-
 
 
 /**
@@ -105,7 +103,6 @@ IDBKeyRange.bound = function (lower, upper, lowerOpen, upperOpen) { return new I
 /**
  * @typedef {"next"|"nextunique"|"prev"|"prevunique"} IDBCursorDirection
  */
-
 
 
 /**
