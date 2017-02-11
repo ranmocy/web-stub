@@ -237,6 +237,8 @@ function convertInterface(definition) {
 
   let no_interface_object = false;
   let constructor_arguments = [];
+  let exposed = [];
+
   definition.extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'NoInterfaceObject': {
@@ -245,6 +247,16 @@ function convertInterface(definition) {
       }
       case 'Constructor': {
         constructor_arguments = attr.arguments;
+        break;
+      }
+      case 'Exposed': {
+        assert(attr.arguments === null);
+        if (attr.rhs.type === 'identifier') {
+          assert(typeof(attr.rhs.value) === 'string');
+          exposed = [attr.rhs.value];
+        } else if (attr.rhs.type === 'identifier-list') {
+          exposed = attr.rhs.value;
+        }
         break;
       }
       default: {
@@ -273,6 +285,11 @@ function convertInterface(definition) {
   if (definition.inheritance !== null) {
     result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
   }
+
+  exposed.forEach((target_class) => {
+    result.push(`${target_class}.prototype.${definition.name} = ${definition};`);
+  });
+
   return getDocFromLines(doc_lines) + result.join("\n") + "\n\n" +
     definition.members.map(member => {
       switch (member.type) {
@@ -378,6 +395,9 @@ function convertFile(source_path, target_path) {
   assert(target_path.endsWith(".js"));
 
   let result = fs.readFileSync(source_path, 'utf8').split("\n\n").map(idl_str => {
+    if (idl_str.length === 0) {
+      return;
+    }
     let definition = WebIDL2.parse(idl_str);
     assert(definition.length === 1, definition.length);
     definition = definition[0];
