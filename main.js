@@ -410,50 +410,50 @@ function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
 
-  let result = fs.readFileSync(source_path, 'utf8')
+  let idls = fs.readFileSync(source_path, 'utf8')
     .split("\n\n")
-    .filter(str => str.length > 0)
-    .map(idl_str => {
-      // console.log("==================");
-      // console.log(idl_str);
+    .filter(str => str.length > 0);
+  fs.writeFileSync(target_path, "", {flag: 'w'});
 
-      let definition = WebIDL2.parse(idl_str);
-      assert(definition.length === 1, definition.length);
-      definition = definition[0];
+  idls.forEach((idl_str) => {
+    console.log("==================");
+    console.log(idl_str);
 
-      let doc = getDocFromLines(idl_str.split("\n"));
-      let str;
-      switch (definition.type) {
-        case 'interface': {
-          str = convertInterface(definition);
-          break;
-        }
-        case 'enum': {
-          str = convertEnum(definition);
-          break;
-        }
-        case 'dictionary': {
-          str = convertDict(definition);
-          break;
-        }
-        case 'implements': {
-          str = convertImpl(definition);
-          break;
-        }
-        case 'typedef': {
-          str = convertTypeDef(definition);
-          break;
-        }
-        default: {
-          fail("Un-supported type:" + definition.type, definition);
-        }
+    let definition = WebIDL2.parse(idl_str);
+    assert(definition.length === 1, definition.length);
+    definition = definition[0];
+
+    let doc = getDocFromLines(idl_str.split("\n"));
+    let str;
+    switch (definition.type) {
+      case 'interface': {
+        str = convertInterface(definition);
+        break;
       }
-      let definition_result = doc + "\n" + str + "\n";
-      // console.log(definition_result);
-      return definition_result;
-    });
-
-  fs.writeFileSync(target_path, result.join("\n\n") + "\n");
+      case 'enum': {
+        str = convertEnum(definition);
+        break;
+      }
+      case 'dictionary': {
+        str = convertDict(definition);
+        break;
+      }
+      case 'implements': {
+        str = convertImpl(definition);
+        break;
+      }
+      case 'typedef': {
+        str = convertTypeDef(definition);
+        break;
+      }
+      default: {
+        fail("Un-supported type:" + definition.type, definition);
+      }
+    }
+    let definition_result = doc + "\n" + str + "\n";
+    console.log(definition_result);
+    fs.writeFileSync(target_path, definition_result + "\n\n", {flag: 'a'});
+  });
 }
 
 function convertDir(source_root, target_root, ignore_error) {
