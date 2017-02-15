@@ -24,6 +24,18 @@ function getDocFromLines(lines) {
   return `/**\n${doc}\n */`;
 }
 
+function getTypeOfArray(sub_type) {
+
+  return {
+    // array: (sub_type.array === false ? 1 : sub_type.array + 1),
+    sequence: true,
+    generic: 'sequence',
+    idlType: sub_type,
+    nullable: false,
+    union: false,
+  };
+}
+
 /**
  * @returns {*} -- "new TargetClass()"
  */
@@ -56,7 +68,7 @@ function getDefaultValueOfType(type) {
   if (type.nullable || type.union) {
     return 'null';
   }
-  assert(typeof type.idlType === 'string');
+  assert(typeof type.idlType === 'string', type.idlType);
   if (type.idlType === 'void') {
     assert(!type.sequence);
   }
@@ -237,6 +249,47 @@ function convertInterfaceOperation(interface_name, member) {
   return result.join("\n");
 }
 
+/** @returns {string[]} */
+function getAllIterators(interface_name, member) {
+  console.log(member);
+  assert(member.extAttrs.length === 0);
+  if (Array.isArray(member.idlType)) {
+    // Map iterators
+    assert(member.idlType.length === 2);
+    let key_type = member.idlType[0];
+    let key_array_type = getTypeOfArray(key_type);
+    let value_type = member.idlType[1];
+    let value_array_type = getTypeOfArray(value_type);
+    let iterators = [];
+    iterators.push(
+      getDocFromLines([`@returns {${getTypeInDoc(key_array_type)}}`]) + "\n" +
+      getFunction(`${interface_name}.prototype.keys`, [], key_array_type));
+    iterators.push(
+      getDocFromLines([`@returns {${getTypeInDoc(value_array_type)}}`]) + "\n" +
+      getFunction(`${interface_name}.prototype.values`, [], value_array_type));
+    iterators.push(getFunction(`${interface_name}.prototype.entries`, [], value_type));
+    // TODO: fix doc and return value of iterator
+    iterators.push(getFunction(`${interface_name}.prototype[Symbol.iterator]`, [], value_type));
+
+    // [ { sequence: false,
+    //   generic: null,
+    //   nullable: false,
+    //   array: false,
+    //   union: false,
+    //   idlType: 'ByteString' },
+    //   { sequence: false,
+    //     generic: null,
+    //     nullable: false,
+    //     array: false,
+    //     union: false,
+    //     idlType: 'ByteString' } ],
+    return iterators;
+
+  } else {
+    fail("Array iterator is not supported yet");
+  }
+}
+
 function convertInterface(definition) {
   assert(!definition.partial);
 
@@ -296,21 +349,26 @@ function convertInterface(definition) {
   });
 
   let interface_part = [getDocFromLines(doc_lines)].concat(result).join("\n");
+  let all_parts = [interface_part];
 
-  let all_parts = [interface_part].concat(
-    definition.members.map(member => {
-      switch (member.type) {
-        case 'attribute': {
-          return convertInterfaceAttribute(definition.name, member);
-        }
-        case 'operation': {
-          return convertInterfaceOperation(definition.name, member);
-        }
-        // TODO iterator
-        default:
-          fail("Un-supported member type:" + member.type, member);
+  definition.members.forEach(member => {
+    switch (member.type) {
+      case 'attribute': {
+        all_parts.push(convertInterfaceAttribute(definition.name, member));
+        break;
       }
-    }));
+      case 'operation': {
+        all_parts.push(convertInterfaceOperation(definition.name, member));
+        break;
+      }
+      case 'iterable': {
+        all_parts = all_parts.concat(getAllIterators(definition.name, member));
+        break;
+      }
+      default:
+        fail("Un-supported member type:" + member.type, member);
+    }
+  });
 
   return all_parts.join("\n\n");
 }
@@ -410,12 +468,12 @@ function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
 
-  let idls = fs.readFileSync(source_path, 'utf8')
+  let idl_list = fs.readFileSync(source_path, 'utf8')
     .split("\n\n")
     .filter(str => str.length > 0);
   fs.writeFileSync(target_path, "", {flag: 'w'});
 
-  idls.forEach((idl_str) => {
+  idl_list.forEach((idl_str) => {
     console.log("==================");
     console.log(idl_str);
 
