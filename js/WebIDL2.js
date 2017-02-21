@@ -1,6 +1,6 @@
 /**
  * interface WebIDL2 {
- *   sequence<WebIDLDefination> parse(DOMString idl_string);
+ *   sequence<WebIDLDefinition> parse(DOMString idl_string);
  * };
  */
 /**
@@ -10,16 +10,16 @@ let WebIDL2 = function () {};
 
 /**
  * @param {string} idl_string
- * @returns {WebIDLDefination[]}
+ * @returns {WebIDLDefinition[]}
  */
-WebIDL2.prototype.parse = function (idl_string) { return [new WebIDLDefination()]; };
+WebIDL2.prototype.parse = function (idl_string) { return [new WebIDLDefinition()]; };
 
 
 /**
- * typedef (WebIDLInterface or WebIDLCallback or WebIDLDictionary or WebIDLEnum or WebIDLTypeDef or WebIDLImplements) WebIDLDefination;
+ * typedef (WebIDLInterface or WebIDLCallback or WebIDLDictionary or WebIDLEnum or WebIDLTypeDef or WebIDLImplements) WebIDLDefinition;
  */
 /**
- * @typedef {(WebIDLInterface|WebIDLCallback|WebIDLDictionary|WebIDLEnum|WebIDLTypeDef|WebIDLImplements)} WebIDLDefination
+ * @typedef {(WebIDLInterface|WebIDLCallback|WebIDLDictionary|WebIDLEnum|WebIDLTypeDef|WebIDLImplements)} WebIDLDefinition
  */
 
 

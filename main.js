@@ -491,6 +491,7 @@ function convertFile(source_path, target_path) {
       return;
     }
     assert(definition.length === 1, definition.length);
+    /** @type [WebIDLDefinition] */
     definition = definition[0];
 
     let doc = getDocFromLines(idl_str.split("\n"));

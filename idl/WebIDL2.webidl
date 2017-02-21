@@ -1,8 +1,8 @@
 interface WebIDL2 {
-  sequence<WebIDLDefination> parse(DOMString idl_string);
+  sequence<WebIDLDefinition> parse(DOMString idl_string);
 };
 
-typedef (WebIDLInterface or WebIDLCallback or WebIDLDictionary or WebIDLEnum or WebIDLTypeDef or WebIDLImplements) WebIDLDefination;
+typedef (WebIDLInterface or WebIDLCallback or WebIDLDictionary or WebIDLEnum or WebIDLTypeDef or WebIDLImplements) WebIDLDefinition;
 
 dictionary WebIDLType {
   bool array = false;
