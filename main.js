@@ -63,16 +63,19 @@ function getDefaultValueObj(idlType) {
  */
 function getDefaultValueOfType(type) {
   assert(type);
-  assert(!type.array);
+  if (typeof(type) === 'string') {
+    return getDefaultValueObj(type);
+  }
 
+  assert(!type.array);
   if (type.nullable || type.union) {
     return 'null';
   }
-  assert(typeof type.idlType === 'string', type.idlType);
   if (type.idlType === 'void') {
     assert(!type.sequence);
   }
-  let obj = getDefaultValueObj(type.idlType);
+
+  let obj = getDefaultValueOfType(type.idlType);
   return type.sequence ? `[${obj}]` : `${obj}`;
 }
 
@@ -91,6 +94,9 @@ function getDefaultValueOfDefault(default_def) {
     }
     case 'null': {
       return null;
+    }
+    case 'sequence': {
+      return default_def.value;
     }
     default: {
       fail("Un-supported arg default type:" + default_def.type, default_def);
@@ -231,7 +237,7 @@ function convertInterfaceOperation(interface_name, member) {
   assert(!member.deleter);
   assert(!member.legacycaller);
   assert(!member.stringifier);
-  assert(member.extAttrs.length === 0);
+  assert(member.extAttrs.length === 0, member.extAttrs);
   if (interface_name === null) {
     assert(!member.static);
   }
@@ -408,7 +414,10 @@ function getDictPropertyInDoc(property) {
 }
 
 function convertDictField(dict_name, field) {
-  return `${dict_name}.${field.name} = ${getDefaultValueOfDefault(field.default)};`;
+  let default_value = typeof(field.default) !== 'undefined' ?
+    getDefaultValueOfDefault(field.default) :
+    getDefaultValueOfType(field.idlType);
+  return `${dict_name}.${field.name} = ${default_value};`;
 }
 
 function convertDict(definition) {
@@ -478,6 +487,9 @@ function convertFile(source_path, target_path) {
     console.log(idl_str);
 
     let definition = WebIDL2.parse(idl_str);
+    if (definition.length === 0) {
+      return;
+    }
     assert(definition.length === 1, definition.length);
     definition = definition[0];
 
