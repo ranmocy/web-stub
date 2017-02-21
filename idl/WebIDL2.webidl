@@ -21,7 +21,7 @@ dictionary WebIDLInterface {
   bool partial = false;
   sequence<WebIDLInterfaceMember> members;
   DOMString? inheritance = null;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 typedef (WebIDLAttributeMember or WebIDLConstantMember or WebIDLOperationMember or WebIDLIteratorMember or WebIDLIterable) WebIDLInterfaceMember;
@@ -34,7 +34,7 @@ dictionary WebIDLAttributeMember {
   bool readonly = false;
   WebIDLType idlType;
   DOMString name;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 dictionary WebIDLConstantMember {
@@ -43,7 +43,7 @@ dictionary WebIDLConstantMember {
   WebIDLSimpleType idlType;
   DOMString name;
   WebIDLConstValue value;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 // TODO: dictionary WebIDLSerializerMember {};
@@ -60,13 +60,13 @@ dictionary WebIDLOperationMember {
   WebIDLType idlType;
   DOMString name;
   sequence<WebIDLArgument> arguments;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 dictionary WebIDLArgument {
   bool optional = false;
   bool variadic = true;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
   WebIDLType idlType;
   DOMString name;
 };
@@ -82,14 +82,14 @@ dictionary WebIDLIteratorMember {
   bool stringifier = false;
   WebIDLType idlType;
   DOMString? iteratorObject = null;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 dictionary WebIDLIterable {
   WebIDLIterableType type;
   (WebIDLType or record<DOMString, WebIDLType>) idlType;
   bool readonly = false; // only for maplike and setlike
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 enum WebIDLIterableType {
@@ -101,7 +101,7 @@ dictionary WebIDLCallback {
   DOMString name;
   WebIDLType idlType;
   sequence<WebIDLArgument> arguments;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 dictionary WebIDLDictionary {
@@ -110,7 +110,7 @@ dictionary WebIDLDictionary {
   bool partial = false;
   sequence<WebIDLDictionaryMember> members;
   DOMString? inheritance = null;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 dictionary WebIDLDictionaryMember {
@@ -118,32 +118,45 @@ dictionary WebIDLDictionaryMember {
   DOMString name;
   bool required;
   WebIDLType idlType;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
   WebIDLConstValue default;
 };
 
-// TODO: dictionary WebIDLException {};
+dictionary WebIDLException {
+  DOMString type = "exception";
+  DOMString name;
+  sequence<WebIDLExceptionMember> members;
+  DOMString? inheritance = null;
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
+};
+
+dictionary WebIDLExceptionMember {
+  DOMString type = "field";
+  DOMString name;
+  WebIDLType idlType;
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
+};
 
 dictionary WebIDLEnum {
   DOMString type = "enum";
   DOMString name;
   sequence<DOMString> values;
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
 };
 
 dictionary WebIDLTypeDef {
   DOMString type = "typedef";
-  sequence<WebIDLExtenedAttribute> extAttrs = [];
+  sequence<WebIDLExtendedAttribute> extAttrs = [];
   WebIDLType idlType;
   DOMString name;
-  sequence<WebIDLExtenedAttribute> typeExtAttrs = [];
+  sequence<WebIDLExtendedAttribute> typeExtAttrs = [];
 };
 
 dictionary WebIDLImplements {
   DOMString type = "implements";
   DOMString target;
   DOMString implements;
-  sequence<WebIDLExtenedAttribute> extAttrs;
+  sequence<WebIDLExtendedAttribute> extAttrs;
 };
 
 // Also used for const values
@@ -159,18 +172,18 @@ enum WebIDLConstValueType {
   "string", "number", "boolean", "null", "Infinity", "NaN", "sequence"
 };
 
-dictionary WebIDLExtenedAttribute {
+dictionary WebIDLExtendedAttribute {
   DOMString name;
   sequence<WebIDLArgument> arguments = null;
-  WebIDLExtenedAttributeRHS? rhs;
+  WebIDLExtendedAttributeRHS? rhs;
   record<DOMString, WebIDLType>? typePair;
 };
 
-dictionary WebIDLExtenedAttributeRHS {
-  WebIDLExtenedAttributeRHSType type;
+dictionary WebIDLExtendedAttributeRHS {
+  WebIDLExtendedAttributeRHSType type;
   DOMString value;
 };
 
-enum WebIDLExtenedAttributeRHSType {
+enum WebIDLExtendedAttributeRHSType {
   "identifier", "identifier-list"
 };
