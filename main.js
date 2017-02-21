@@ -64,7 +64,7 @@ function getDefaultValueObj(idlType) {
 function getDefaultValueOfType(type) {
   assert(type);
   if (typeof(type) === 'string') {
-    return getDefaultValueObj(type);
+    return `${getDefaultValueObj(type)}`;
   }
 
   assert(!type.array);
