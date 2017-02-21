@@ -213,6 +213,7 @@ WebIDLOperationMember.extAttrs = [new WebIDLExtendedAttribute()];
  *   sequence<WebIDLExtendedAttribute> extAttrs;
  *   WebIDLType idlType;
  *   DOMString name;
+ *   WebIDLConstValue default;
  * };
  */
 /**
@@ -222,6 +223,7 @@ WebIDLOperationMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  * @property {WebIDLType} [idlType]
  * @property {string} [name]
+ * @property {WebIDLConstValue} [default]
  */
 let WebIDLArgument = {};
 WebIDLArgument.optional = false;
@@ -229,6 +231,7 @@ WebIDLArgument.variadic = true;
 WebIDLArgument.extAttrs = [new WebIDLExtendedAttribute()];
 WebIDLArgument.idlType = new WebIDLType();
 WebIDLArgument.name = "";
+WebIDLArgument.default = new WebIDLConstValue();
 
 
 /**

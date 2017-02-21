@@ -4,10 +4,26 @@ const WebIDL2 = require("webidl2");
 const fs = require('fs');
 const assert_ext = require('assert');
 
+/**
+ * @param {Object} obj
+ * @returns {boolean}
+ */
+function isDefined(obj) {
+  return typeof(obj) !== 'undefined' && obj !== null;
+}
+
+/**
+ * @param {boolean} condition
+ * @param {Object} [obj]
+ */
 function assert(condition, obj) {
   assert_ext(condition, JSON.stringify(obj));
 }
 
+/**
+ * @param {string} msg
+ * @param {Object} [obj]
+ */
 function fail(msg, obj) {
   assert_ext(false, msg + ", " + JSON.stringify(obj));
 }
@@ -24,19 +40,24 @@ function getDocFromLines(lines) {
   return `/**\n${doc}\n */`;
 }
 
+/**
+ * @param {WebIDLType} sub_type
+ * @returns {WebIDLType}
+ */
 function getTypeOfArray(sub_type) {
-
   return {
-    // array: (sub_type.array === false ? 1 : sub_type.array + 1),
     sequence: true,
     generic: 'sequence',
-    idlType: sub_type,
     nullable: false,
+    nullableArray: null,
+    array: (sub_type.array === false ? 1 : sub_type.array + 1),
     union: false,
+    idlType: sub_type,
   };
 }
 
 /**
+ * @param {WebIDLSimpleType} idlType
  * @returns {*} -- "new TargetClass()"
  */
 function getDefaultValueObj(idlType) {
@@ -59,10 +80,11 @@ function getDefaultValueObj(idlType) {
 }
 
 /**
+ * @param {WebIDLSimpleType | WebIDLType} type
  * @returns {string} -- "[new TargetClass()]"
  */
 function getDefaultValueOfType(type) {
-  assert(type);
+  assert(isDefined(type));
   if (typeof(type) === 'string') {
     return `${getDefaultValueObj(type)}`;
   }
@@ -80,10 +102,11 @@ function getDefaultValueOfType(type) {
 }
 
 /**
- * @returns {string|number|null} "some_string"
+ * @param {WebIDLConstValue} default_def
+ * @returns {string|number|null} -- "some_string"
  */
 function getDefaultValueOfDefault(default_def) {
-  assert(typeof(default_def) !== 'undefined');
+  assert(isDefined(default_def));
   switch (default_def.type) {
     case 'string': {
       return `'${default_def.value}'`;
@@ -105,6 +128,7 @@ function getDefaultValueOfDefault(default_def) {
 }
 
 /**
+ * @param {string} idlType
  * @returns {string} -- "string"
  */
 function getTypePlainName(idlType) {
@@ -124,18 +148,17 @@ function getTypePlainName(idlType) {
 }
 
 /**
+ * @param {WebIDLType} type
  * @returns {string} -- "string|string[]"
  */
 function getTypeInDoc(type) {
-  // String indicating the generic type (e.g. "Promise", "sequence"). null otherwise.
-  // assert(type.generic === null);
   assert(!type.array);
 
   let doc = type.nullable ? "?" : "";
   if (type.union) {
     assert(!type.sequence);
     assert(type.generic === null);
-    assert((typeof(type.default) === 'undefined'));
+    assert((typeof(type['default']) === 'undefined'));
     assert(Array.isArray(type.idlType));
     doc += "(" + type.idlType.map(getTypeInDoc).join("|") + ")";
   } else if (type.sequence) {
@@ -154,6 +177,7 @@ function getTypeInDoc(type) {
 }
 
 /**
+ * @param {WebIDLArgument} arg
  * @returns {string} -- "@param {string|string[]} storeNames"
  */
 function getArgInDoc(arg) {
@@ -189,6 +213,8 @@ function getArgInDoc(arg) {
 }
 
 /**
+ * @param {string} interface_name
+ * @param {WebIDLAttributeMember} member
  * @returns {string} -- doc "@type {(string|string[])} attr_name"
  *                      body "Target.prototype.attr_name = 'default_value';"
  */
@@ -197,7 +223,7 @@ function convertInterfaceAttribute(interface_name, member) {
   assert(!member.stringifier);
   assert(!member.inherit);
   assert(member.extAttrs.length === 0);
-  assert(interface_name);
+  assert(isDefined(interface_name));
 
   let result = [];
   let doc_lines = [
@@ -215,6 +241,9 @@ function convertInterfaceAttribute(interface_name, member) {
 }
 
 /**
+ * @param {string} name
+ * @param {WebIDLArgument[]} args
+ * @param {?WebIDLType} return_type
  * @returns {string} -- "<name> = function (arg1, arg2) { return default_value; };"
  */
 function getFunction(name, args, return_type) {
@@ -230,6 +259,11 @@ function getFunction(name, args, return_type) {
   return result.join("");
 }
 
+/**
+ * @param {string} interface_name
+ * @param {WebIDLOperationMember} member
+ * @returns {string}
+ */
 function convertInterfaceOperation(interface_name, member) {
   assert(!member.getter);
   assert(!member.setter);
@@ -255,7 +289,11 @@ function convertInterfaceOperation(interface_name, member) {
   return result.join("\n");
 }
 
-/** @returns {string[]} */
+/**
+ * @param {string} interface_name
+ * @param {WebIDLIteratorMember} member
+ * @returns {string[]}
+ */
 function getAllIterators(interface_name, member) {
   console.log(member);
   assert(member.extAttrs.length === 0);
@@ -296,6 +334,10 @@ function getAllIterators(interface_name, member) {
   }
 }
 
+/**
+ * @param {WebIDLInterface} definition
+ * @returns {string}
+ */
 function convertInterface(definition) {
   assert(!definition.partial);
 
@@ -379,6 +421,10 @@ function convertInterface(definition) {
   return all_parts.join("\n\n");
 }
 
+/**
+ * @param {WebIDLEnum} definition
+ * @returns {string}
+ */
 function convertEnum(definition) {
   assert(definition.extAttrs.length === 0);
 
@@ -392,34 +438,44 @@ function convertEnum(definition) {
 }
 
 /**
+ * @param {WebIDLDictionaryMember} field
  * @returns {string} -- "@property {string|string[]} storeNames"
  */
-function getDictPropertyInDoc(property) {
-  assert(!property.required);
-  assert(property.extAttrs.length === 0);
-  assert(property.type === 'field');
+function getDictFieldInDoc(field) {
+  assert(field.extAttrs.length === 0);
+  assert(field.type === 'field');
 
-  let name = property.name;
-  if (typeof(property.default) !== 'undefined') {
-    name += `=${getDefaultValueOfDefault(property.default)}`;
+  let name = field.name;
+  if (typeof(field.default) !== 'undefined') {
+    name += `=${getDefaultValueOfDefault(field.default)}`;
   }
-  if (!property.required) {
+  if (!field.required) {
     name = `[${name}]`;
   }
 
   let doc = [];
-  doc.push(`@property {${getTypeInDoc(property.idlType)}} `);
+  doc.push(`@property {${getTypeInDoc(field.idlType)}} `);
   doc.push(name);
   return doc.join("");
 }
 
+/**
+ * @param {string} dict_name
+ * @param {WebIDLDictionaryMember} field
+ * @returns {string}
+ */
 function convertDictField(dict_name, field) {
+  assert(field.type === 'field');
   let default_value = typeof(field.default) !== 'undefined' ?
     getDefaultValueOfDefault(field.default) :
     getDefaultValueOfType(field.idlType);
   return `${dict_name}.${field.name} = ${default_value};`;
 }
 
+/**
+ * @param {WebIDLDictionary} definition
+ * @returns {string}
+ */
 function convertDict(definition) {
   assert(!definition.partial);
   assert(definition.extAttrs.length === 0);
@@ -427,7 +483,7 @@ function convertDict(definition) {
   let result = [];
   let doc_lines = [
     `@typedef {Object} ${definition.name}`,
-  ].concat(definition.members.map(getDictPropertyInDoc));
+  ].concat(definition.members.map(getDictFieldInDoc));
   result.push(getDocFromLines(doc_lines));
 
   result.push(`let ${definition.name} = {};`);
@@ -449,6 +505,10 @@ function convertDict(definition) {
   return result.join("\n");
 }
 
+/**
+ * @param {WebIDLImplements} definition
+ * @returns {string}
+ */
 function convertImpl(definition) {
   assert(definition.extAttrs.length === 0);
 
@@ -463,6 +523,10 @@ function convertImpl(definition) {
   return result.join("\n");
 }
 
+/**
+ * @param {WebIDLTypeDef} definition
+ * @returns {string}
+ */
 function convertTypeDef(definition) {
   assert(definition.typeExtAttrs.length === 0);
   assert(definition.extAttrs.length === 0);
@@ -473,6 +537,11 @@ function convertTypeDef(definition) {
   return getDocFromLines(doc);
 }
 
+/**
+ * @param {string} source_path
+ * @param {string} target_path
+ * @return {undefined}
+ */
 function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
@@ -527,6 +596,12 @@ function convertFile(source_path, target_path) {
   });
 }
 
+/**
+ * @param {string} source_root
+ * @param {string} target_root
+ * @param {string} [ignore_error]
+ * @return {undefined}
+ */
 function convertDir(source_root, target_root, ignore_error) {
   assert(fs.lstatSync(source_root).isDirectory());
   if (!fs.existsSync(target_root)) {
@@ -543,14 +618,14 @@ function convertDir(source_root, target_root, ignore_error) {
       try {
         convertFile(source, target.replace(".webidl", ".js"));
       } catch (e) {
-        if (ignore_error) {
+        if (isDefined(ignore_error)) {
           console.log(e);
         } else {
           throw e;
         }
       }
     } else if (source_stat.isDirectory()) {
-      convertDir(source, target);
+      convertDir(source, target, ignore_error);
     } else {
       fail("Un-supported file:" + source, source_stat);
     }
@@ -562,6 +637,9 @@ const URL_TO_IDL = {
   "https://www.w3.org/TR/IndexedDB/" : "idl/IndexedDB.webidl",
   "https://fetch.spec.whatwg.org/" : "idl/Fetch.webidl",
 };
+/**
+ * @returns {undefined} 
+ */
 function updateIDL() {
   for (let url of Object.keys(URL_TO_IDL)) {
     let path = URL_TO_IDL[url];

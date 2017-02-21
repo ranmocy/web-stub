@@ -70,6 +70,7 @@ dictionary WebIDLArgument {
   sequence<WebIDLExtendedAttribute> extAttrs;
   WebIDLType idlType;
   DOMString name;
+  WebIDLConstValue default;
 };
 
 dictionary WebIDLIteratorMember {
