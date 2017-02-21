@@ -25,30 +25,33 @@ WebIDL2.prototype.parse = function (idl_string) { return [new WebIDLDefinition()
 
 /**
  * dictionary WebIDLType {
- *   bool array = false;
+ *   boolean sequence = false;
  *   DOMString? generic = null;
+ *   boolean nullable = false;
+ *   sequence<boolean> nullableArray = null;
+ *   (boolean or unsigned short) array = false;
+ *   boolean union = false;
  *   (DOMString or sequence<WebIDLType> or WebIDLType) idlType = "void";
- *   bool nullable = false;
- *   sequence<bool> nullableArray = null;
- *   bool union = false;
  * };
  */
 /**
  * @typedef {Object} WebIDLType
- * @property {bool} [array=false]
+ * @property {boolean} [sequence=false]
  * @property {?string} [generic=null]
+ * @property {boolean} [nullable=false]
+ * @property {boolean[]} [nullableArray=null]
+ * @property {(boolean|unsigned short)} [array=false]
+ * @property {boolean} [union=false]
  * @property {(string|WebIDLType[]|WebIDLType)} [idlType='void']
- * @property {bool} [nullable=false]
- * @property {bool[]} [nullableArray=null]
- * @property {bool} [union=false]
  */
 let WebIDLType = {};
-WebIDLType.array = false;
+WebIDLType.sequence = false;
 WebIDLType.generic = null;
-WebIDLType.idlType = 'void';
 WebIDLType.nullable = false;
 WebIDLType.nullableArray = null;
+WebIDLType.array = false;
 WebIDLType.union = false;
+WebIDLType.idlType = 'void';
 
 
 /**
@@ -63,7 +66,7 @@ WebIDLType.union = false;
  * dictionary WebIDLInterface {
  *   DOMString type = "interface";
  *   DOMString name;
- *   bool partial = false;
+ *   boolean partial = false;
  *   sequence<WebIDLInterfaceMember> members;
  *   DOMString? inheritance = null;
  *   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -73,7 +76,7 @@ WebIDLType.union = false;
  * @typedef {Object} WebIDLInterface
  * @property {string} [type='interface']
  * @property {string} [name]
- * @property {bool} [partial=false]
+ * @property {boolean} [partial=false]
  * @property {WebIDLInterfaceMember[]} [members]
  * @property {?string} [inheritance=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
@@ -98,10 +101,10 @@ WebIDLInterface.extAttrs = [new WebIDLExtendedAttribute()];
 /**
  * dictionary WebIDLAttributeMember {
  *   DOMString type = "attribute";
- *   bool static = false;
- *   bool stringifier = false;
- *   bool inherit = false;
- *   bool readonly = false;
+ *   boolean static = false;
+ *   boolean stringifier = false;
+ *   boolean inherit = false;
+ *   boolean readonly = false;
  *   WebIDLType idlType;
  *   DOMString name;
  *   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -110,10 +113,10 @@ WebIDLInterface.extAttrs = [new WebIDLExtendedAttribute()];
 /**
  * @typedef {Object} WebIDLAttributeMember
  * @property {string} [type='attribute']
- * @property {bool} [static=false]
- * @property {bool} [stringifier=false]
- * @property {bool} [inherit=false]
- * @property {bool} [readonly=false]
+ * @property {boolean} [static=false]
+ * @property {boolean} [stringifier=false]
+ * @property {boolean} [inherit=false]
+ * @property {boolean} [readonly=false]
  * @property {WebIDLType} [idlType]
  * @property {string} [name]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
@@ -132,7 +135,7 @@ WebIDLAttributeMember.extAttrs = [new WebIDLExtendedAttribute()];
 /**
  * dictionary WebIDLConstantMember {
  *   DOMString type = "const";
- *   bool nullable = false;
+ *   boolean nullable = false;
  *   WebIDLSimpleType idlType;
  *   DOMString name;
  *   WebIDLConstValue value;
@@ -142,7 +145,7 @@ WebIDLAttributeMember.extAttrs = [new WebIDLExtendedAttribute()];
 /**
  * @typedef {Object} WebIDLConstantMember
  * @property {string} [type='const']
- * @property {bool} [nullable=false]
+ * @property {boolean} [nullable=false]
  * @property {WebIDLSimpleType} [idlType]
  * @property {string} [name]
  * @property {WebIDLConstValue} [value]
@@ -160,13 +163,13 @@ WebIDLConstantMember.extAttrs = [new WebIDLExtendedAttribute()];
 /**
  * dictionary WebIDLOperationMember {
  *   DOMString type = "operation";
- *   bool getter = false;
- *   bool setter = false;
- *   bool creator = false;
- *   bool deleter = false;
- *   bool legacycaller = false;
- *   bool static = false;
- *   bool stringifier = false;
+ *   boolean getter = false;
+ *   boolean setter = false;
+ *   boolean creator = false;
+ *   boolean deleter = false;
+ *   boolean legacycaller = false;
+ *   boolean static = false;
+ *   boolean stringifier = false;
  *   WebIDLType idlType;
  *   DOMString name;
  *   sequence<WebIDLArgument> arguments;
@@ -176,13 +179,13 @@ WebIDLConstantMember.extAttrs = [new WebIDLExtendedAttribute()];
 /**
  * @typedef {Object} WebIDLOperationMember
  * @property {string} [type='operation']
- * @property {bool} [getter=false]
- * @property {bool} [setter=false]
- * @property {bool} [creator=false]
- * @property {bool} [deleter=false]
- * @property {bool} [legacycaller=false]
- * @property {bool} [static=false]
- * @property {bool} [stringifier=false]
+ * @property {boolean} [getter=false]
+ * @property {boolean} [setter=false]
+ * @property {boolean} [creator=false]
+ * @property {boolean} [deleter=false]
+ * @property {boolean} [legacycaller=false]
+ * @property {boolean} [static=false]
+ * @property {boolean} [stringifier=false]
  * @property {WebIDLType} [idlType]
  * @property {string} [name]
  * @property {WebIDLArgument[]} [arguments]
@@ -205,8 +208,8 @@ WebIDLOperationMember.extAttrs = [new WebIDLExtendedAttribute()];
 
 /**
  * dictionary WebIDLArgument {
- *   bool optional = false;
- *   bool variadic = true;
+ *   boolean optional = false;
+ *   boolean variadic = true;
  *   sequence<WebIDLExtendedAttribute> extAttrs;
  *   WebIDLType idlType;
  *   DOMString name;
@@ -214,8 +217,8 @@ WebIDLOperationMember.extAttrs = [new WebIDLExtendedAttribute()];
  */
 /**
  * @typedef {Object} WebIDLArgument
- * @property {bool} [optional=false]
- * @property {bool} [variadic=true]
+ * @property {boolean} [optional=false]
+ * @property {boolean} [variadic=true]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  * @property {WebIDLType} [idlType]
  * @property {string} [name]
@@ -231,13 +234,13 @@ WebIDLArgument.name = "";
 /**
  * dictionary WebIDLIteratorMember {
  *   DOMString type = "iterator";
- *   bool getter = false;
- *   bool setter = false;
- *   bool creator = false;
- *   bool deleter = false;
- *   bool legacycaller = false;
- *   bool static = false;
- *   bool stringifier = false;
+ *   boolean getter = false;
+ *   boolean setter = false;
+ *   boolean creator = false;
+ *   boolean deleter = false;
+ *   boolean legacycaller = false;
+ *   boolean static = false;
+ *   boolean stringifier = false;
  *   WebIDLType idlType;
  *   DOMString? iteratorObject = null;
  *   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -246,13 +249,13 @@ WebIDLArgument.name = "";
 /**
  * @typedef {Object} WebIDLIteratorMember
  * @property {string} [type='iterator']
- * @property {bool} [getter=false]
- * @property {bool} [setter=false]
- * @property {bool} [creator=false]
- * @property {bool} [deleter=false]
- * @property {bool} [legacycaller=false]
- * @property {bool} [static=false]
- * @property {bool} [stringifier=false]
+ * @property {boolean} [getter=false]
+ * @property {boolean} [setter=false]
+ * @property {boolean} [creator=false]
+ * @property {boolean} [deleter=false]
+ * @property {boolean} [legacycaller=false]
+ * @property {boolean} [static=false]
+ * @property {boolean} [stringifier=false]
  * @property {WebIDLType} [idlType]
  * @property {?string} [iteratorObject=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
@@ -275,7 +278,7 @@ WebIDLIteratorMember.extAttrs = [new WebIDLExtendedAttribute()];
  * dictionary WebIDLIterable {
  *   WebIDLIterableType type;
  *   (WebIDLType or record<DOMString, WebIDLType>) idlType;
- *   bool readonly = false; // only for maplike and setlike
+ *   boolean readonly = false; // only for maplike and setlike
  *   sequence<WebIDLExtendedAttribute> extAttrs;
  * };
  */
@@ -283,7 +286,7 @@ WebIDLIteratorMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @typedef {Object} WebIDLIterable
  * @property {WebIDLIterableType} [type]
  * @property {(WebIDLType|Object.<string, WebIDLType>)} [idlType]
- * @property {bool} [readonly=false]
+ * @property {boolean} [readonly=false]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
 let WebIDLIterable = {};
@@ -332,7 +335,7 @@ WebIDLCallback.extAttrs = [new WebIDLExtendedAttribute()];
  * dictionary WebIDLDictionary {
  *   DOMString type = "dictionary";
  *   DOMString name;
- *   bool partial = false;
+ *   boolean partial = false;
  *   sequence<WebIDLDictionaryMember> members;
  *   DOMString? inheritance = null;
  *   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -342,7 +345,7 @@ WebIDLCallback.extAttrs = [new WebIDLExtendedAttribute()];
  * @typedef {Object} WebIDLDictionary
  * @property {string} [type='dictionary']
  * @property {string} [name]
- * @property {bool} [partial=false]
+ * @property {boolean} [partial=false]
  * @property {WebIDLDictionaryMember[]} [members]
  * @property {?string} [inheritance=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
@@ -360,7 +363,7 @@ WebIDLDictionary.extAttrs = [new WebIDLExtendedAttribute()];
  * dictionary WebIDLDictionaryMember {
  *   DOMString type = "field";
  *   DOMString name;
- *   bool required;
+ *   boolean required;
  *   WebIDLType idlType;
  *   sequence<WebIDLExtendedAttribute> extAttrs;
  *   WebIDLConstValue default;
@@ -370,7 +373,7 @@ WebIDLDictionary.extAttrs = [new WebIDLExtendedAttribute()];
  * @typedef {Object} WebIDLDictionaryMember
  * @property {string} [type='field']
  * @property {string} [name]
- * @property {bool} [required]
+ * @property {boolean} [required]
  * @property {WebIDLType} [idlType]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  * @property {WebIDLConstValue} [default]
@@ -378,7 +381,7 @@ WebIDLDictionary.extAttrs = [new WebIDLExtendedAttribute()];
 let WebIDLDictionaryMember = {};
 WebIDLDictionaryMember.type = 'field';
 WebIDLDictionaryMember.name = "";
-WebIDLDictionaryMember.required = new bool();
+WebIDLDictionaryMember.required = false;
 WebIDLDictionaryMember.idlType = new WebIDLType();
 WebIDLDictionaryMember.extAttrs = [new WebIDLExtendedAttribute()];
 WebIDLDictionaryMember.default = new WebIDLConstValue();
@@ -504,31 +507,31 @@ WebIDLImplements.extAttrs = [new WebIDLExtendedAttribute()];
  * // Also used for const values
  * dictionary WebIDLConstValue {
  *   WebIDLConstValueType type;
- *   // For string, number, boolean, and sequence:
+ *   // For string, number, booleanean, and sequence:
  *   any value;
  *   // For Infinity:
- *   bool negative;
+ *   boolean negative;
  * };
  */
 /**
  * @typedef {Object} WebIDLConstValue
  * @property {WebIDLConstValueType} [type]
  * @property {*} [value]
- * @property {bool} [negative]
+ * @property {boolean} [negative]
  */
 let WebIDLConstValue = {};
 WebIDLConstValue.type = new WebIDLConstValueType();
 WebIDLConstValue.value = {};
-WebIDLConstValue.negative = new bool();
+WebIDLConstValue.negative = false;
 
 
 /**
  * enum WebIDLConstValueType {
- *   "string", "number", "boolean", "null", "Infinity", "NaN", "sequence"
+ *   "string", "number", "booleanean", "null", "Infinity", "NaN", "sequence"
  * };
  */
 /**
- * @typedef {"string"|"number"|"boolean"|"null"|"Infinity"|"NaN"|"sequence"} WebIDLConstValueType
+ * @typedef {"string"|"number"|"booleanean"|"null"|"Infinity"|"NaN"|"sequence"} WebIDLConstValueType
  */
 
 

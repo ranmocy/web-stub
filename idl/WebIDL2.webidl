@@ -5,12 +5,13 @@ interface WebIDL2 {
 typedef (WebIDLInterface or WebIDLCallback or WebIDLDictionary or WebIDLEnum or WebIDLTypeDef or WebIDLImplements) WebIDLDefinition;
 
 dictionary WebIDLType {
-  bool array = false;
+  boolean sequence = false;
   DOMString? generic = null;
+  boolean nullable = false;
+  sequence<boolean> nullableArray = null;
+  (boolean or unsigned short) array = false;
+  boolean union = false;
   (DOMString or sequence<WebIDLType> or WebIDLType) idlType = "void";
-  bool nullable = false;
-  sequence<bool> nullableArray = null;
-  bool union = false;
 };
 
 typedef DOMString WebIDLSimpleType;
@@ -18,7 +19,7 @@ typedef DOMString WebIDLSimpleType;
 dictionary WebIDLInterface {
   DOMString type = "interface";
   DOMString name;
-  bool partial = false;
+  boolean partial = false;
   sequence<WebIDLInterfaceMember> members;
   DOMString? inheritance = null;
   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -28,10 +29,10 @@ typedef (WebIDLAttributeMember or WebIDLConstantMember or WebIDLOperationMember 
 
 dictionary WebIDLAttributeMember {
   DOMString type = "attribute";
-  bool static = false;
-  bool stringifier = false;
-  bool inherit = false;
-  bool readonly = false;
+  boolean static = false;
+  boolean stringifier = false;
+  boolean inherit = false;
+  boolean readonly = false;
   WebIDLType idlType;
   DOMString name;
   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -39,7 +40,7 @@ dictionary WebIDLAttributeMember {
 
 dictionary WebIDLConstantMember {
   DOMString type = "const";
-  bool nullable = false;
+  boolean nullable = false;
   WebIDLSimpleType idlType;
   DOMString name;
   WebIDLConstValue value;
@@ -50,13 +51,13 @@ dictionary WebIDLConstantMember {
 
 dictionary WebIDLOperationMember {
   DOMString type = "operation";
-  bool getter = false;
-  bool setter = false;
-  bool creator = false;
-  bool deleter = false;
-  bool legacycaller = false;
-  bool static = false;
-  bool stringifier = false;
+  boolean getter = false;
+  boolean setter = false;
+  boolean creator = false;
+  boolean deleter = false;
+  boolean legacycaller = false;
+  boolean static = false;
+  boolean stringifier = false;
   WebIDLType idlType;
   DOMString name;
   sequence<WebIDLArgument> arguments;
@@ -64,8 +65,8 @@ dictionary WebIDLOperationMember {
 };
 
 dictionary WebIDLArgument {
-  bool optional = false;
-  bool variadic = true;
+  boolean optional = false;
+  boolean variadic = true;
   sequence<WebIDLExtendedAttribute> extAttrs;
   WebIDLType idlType;
   DOMString name;
@@ -73,13 +74,13 @@ dictionary WebIDLArgument {
 
 dictionary WebIDLIteratorMember {
   DOMString type = "iterator";
-  bool getter = false;
-  bool setter = false;
-  bool creator = false;
-  bool deleter = false;
-  bool legacycaller = false;
-  bool static = false;
-  bool stringifier = false;
+  boolean getter = false;
+  boolean setter = false;
+  boolean creator = false;
+  boolean deleter = false;
+  boolean legacycaller = false;
+  boolean static = false;
+  boolean stringifier = false;
   WebIDLType idlType;
   DOMString? iteratorObject = null;
   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -88,7 +89,7 @@ dictionary WebIDLIteratorMember {
 dictionary WebIDLIterable {
   WebIDLIterableType type;
   (WebIDLType or record<DOMString, WebIDLType>) idlType;
-  bool readonly = false; // only for maplike and setlike
+  boolean readonly = false; // only for maplike and setlike
   sequence<WebIDLExtendedAttribute> extAttrs;
 };
 
@@ -107,7 +108,7 @@ dictionary WebIDLCallback {
 dictionary WebIDLDictionary {
   DOMString type = "dictionary";
   DOMString name;
-  bool partial = false;
+  boolean partial = false;
   sequence<WebIDLDictionaryMember> members;
   DOMString? inheritance = null;
   sequence<WebIDLExtendedAttribute> extAttrs;
@@ -116,7 +117,7 @@ dictionary WebIDLDictionary {
 dictionary WebIDLDictionaryMember {
   DOMString type = "field";
   DOMString name;
-  bool required;
+  boolean required;
   WebIDLType idlType;
   sequence<WebIDLExtendedAttribute> extAttrs;
   WebIDLConstValue default;
@@ -162,14 +163,14 @@ dictionary WebIDLImplements {
 // Also used for const values
 dictionary WebIDLConstValue {
   WebIDLConstValueType type;
-  // For string, number, boolean, and sequence:
+  // For string, number, booleanean, and sequence:
   any value;
   // For Infinity:
-  bool negative;
+  boolean negative;
 };
 
 enum WebIDLConstValueType {
-  "string", "number", "boolean", "null", "Infinity", "NaN", "sequence"
+  "string", "number", "booleanean", "null", "Infinity", "NaN", "sequence"
 };
 
 dictionary WebIDLExtendedAttribute {
