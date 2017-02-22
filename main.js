@@ -375,15 +375,18 @@ function getAllIterators(interface_name, member) {
 }
 
 /**
- * @param {WebIDLInterface} definition
- * @returns {string}
+ * @typedef {{no_interface_object: boolean, constructor_arguments: WebIDLArgument[], exposed: string[]}} WebIDLInterfaceConfig
  */
-function convertInterface(definition) {
+/**
+ * @param {WebIDLExtendedAttribute[]} extAttrs
+ * @returns {WebIDLInterfaceConfig}
+ */
+function getInterfaceConfig(extAttrs) {
   let no_interface_object = false;
   let constructor_arguments = [];
   let exposed = [];
 
-  definition.extAttrs.forEach(attr => {
+  extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'NoInterfaceObject': {
         no_interface_object = true;
@@ -411,48 +414,70 @@ function convertInterface(definition) {
     }
   });
 
+  return {
+    no_interface_object: no_interface_object,
+    constructor_arguments: constructor_arguments,
+    exposed: exposed,
+  };
+}
+
+/**
+ * @param {WebIDLInterface} definition
+ * @returns {string}
+ */
+function getInterfaceConstructorAndInheritance(definition) {
+  if (definition.partial) {
+    return "";
+  }
+
+  let config = getInterfaceConfig(definition.extAttrs);
   let doc_lines = [];
   let result = [];
 
-  if (!definition.partial) {
-    if (no_interface_object) {
-      assert(constructor_arguments.length === 0);
-      assert(definition.inheritance === null);
+  if (config.no_interface_object) {
+    assert(config.constructor_arguments.length === 0);
+    assert(definition.inheritance === null);
 
-      doc_lines.push(`@interface ${definition.name}`);
-      result.push(`let ${definition.name} = {};`);
-    } else {
-      doc_lines.push("@constructor");
-      if (constructor_arguments) {
-        doc_lines = doc_lines.concat(constructor_arguments.map(getArgInDoc));
-      }
-      result.push(getFunction(`let ${definition.name}`, constructor_arguments, null/*return_type*/));
+    doc_lines.push(`@interface ${definition.name}`);
+    result.push(`let ${definition.name} = {};`);
+  } else {
+    doc_lines.push("@constructor");
+    if (config.constructor_arguments) {
+      doc_lines = doc_lines.concat(config.constructor_arguments.map(getArgInDoc));
     }
-
-    if (definition.inheritance !== null) {
-      result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
-    }
+    result.push(getFunction(`let ${definition.name}`, config.constructor_arguments, null/*return_type*/));
   }
 
-  exposed.forEach((target_class) => {
+  if (definition.inheritance !== null) {
+    result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
+  }
+
+  config.exposed.forEach((target_class) => {
     result.push(`${target_class}.prototype.${definition.name} = ${definition.name};`);
   });
 
-  let interface_part = [getDocFromLines(doc_lines)].concat(result).join("\n");
-  let all_parts = [interface_part];
+  return [getDocFromLines(doc_lines)].concat(result).join("\n");
+}
+
+/**
+ * @param {WebIDLInterface} definition
+ * @returns {string}
+ */
+function convertInterface(definition) {
+  let result = [getInterfaceConstructorAndInheritance(definition)];
 
   definition.members.forEach(member => {
     switch (member.type) {
       case 'attribute': {
-        all_parts.push(convertInterfaceAttribute(definition.name, member));
+        result.push(convertInterfaceAttribute(definition.name, member));
         break;
       }
       case 'operation': {
-        all_parts.push(convertInterfaceOperation(definition.name, member));
+        result.push(convertInterfaceOperation(definition.name, member));
         break;
       }
       case 'iterable': {
-        all_parts = all_parts.concat(getAllIterators(definition.name, member));
+        result = result.concat(getAllIterators(definition.name, member));
         break;
       }
       default:
@@ -460,7 +485,7 @@ function convertInterface(definition) {
     }
   });
 
-  return all_parts.join("\n\n");
+  return result.join("\n\n");
 }
 
 /**
