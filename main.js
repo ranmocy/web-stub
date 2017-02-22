@@ -34,6 +34,9 @@ function fail(msg, obj) {
  * @returns {string} -- JSDoc
  */
 function getDocFromLines(lines) {
+  if (lines.length === 0) {
+    return "";
+  }
   let doc = lines
     .filter(line => (line !== null && line.length > 0))
     .map(line => { return ` * ${line}`; })
@@ -68,6 +71,7 @@ function getDefaultValueObj(idlType) {
     case 'void':
       return '';
     case 'short':
+    case 'unsigned short':
     case 'unsigned long':
     case 'unsigned long long':
       return '0';
@@ -232,13 +236,25 @@ function convertInterfaceAttribute(interface_name, member) {
   assert(!member.static);
   assert(!member.stringifier);
   assert(!member.inherit);
-  assert(member.extAttrs.length === 0);
   assert(isDefined(interface_name));
 
   let result = [];
-  let doc_lines = [
-    `@type {${getTypeInDoc(member.idlType)}}`,
-  ];
+  let doc_lines = [];
+
+  member.extAttrs.forEach(attr => {
+    switch (attr.name) {
+      case 'SameObject': {
+        // By default we always use the same object, no op here
+        doc_lines.push(`[SameObject]`);
+        break;
+      }
+      default: {
+        fail("Un-supported attr:" + attr.name, attr);
+      }
+    }
+  });
+
+  doc_lines.push(`@type {${getTypeInDoc(member.idlType)}}`);
   if (member.readonly) {
     doc_lines.push("@readonly")
   }
@@ -285,10 +301,14 @@ function convertInterfaceOperation(interface_name, member) {
     assert(!member.static);
   }
 
+  let result = [];
+  let doc_lines = [];
+
   member.extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'NewObject': {
         // By default we always create new object, no op here
+        doc_lines.push(`[NewObject]`);
         break;
       }
       default: {
@@ -297,9 +317,8 @@ function convertInterfaceOperation(interface_name, member) {
     }
   });
 
-  let result = [];
-  let doc_lines = member.arguments.map(getArgInDoc)
-    .concat(`@returns {${getTypeInDoc(member.idlType)}}`);
+  doc_lines = doc_lines.concat(member.arguments.map(getArgInDoc));
+  doc_lines.push(`@returns {${getTypeInDoc(member.idlType)}}`);
   result.push(getDocFromLines(doc_lines));
 
   result.push(getFunction(
@@ -360,8 +379,6 @@ function getAllIterators(interface_name, member) {
  * @returns {string}
  */
 function convertInterface(definition) {
-  assert(!definition.partial);
-
   let no_interface_object = false;
   let constructor_arguments = [];
   let exposed = [];
@@ -397,22 +414,24 @@ function convertInterface(definition) {
   let doc_lines = [];
   let result = [];
 
-  if (no_interface_object) {
-    assert(constructor_arguments.length === 0);
-    assert(definition.inheritance === null);
+  if (!definition.partial) {
+    if (no_interface_object) {
+      assert(constructor_arguments.length === 0);
+      assert(definition.inheritance === null);
 
-    doc_lines.push(`@interface ${definition.name}`);
-    result.push(`let ${definition.name} = {};`);
-  } else {
-    doc_lines.push("@constructor");
-    if (constructor_arguments) {
-      doc_lines = doc_lines.concat(constructor_arguments.map(getArgInDoc));
+      doc_lines.push(`@interface ${definition.name}`);
+      result.push(`let ${definition.name} = {};`);
+    } else {
+      doc_lines.push("@constructor");
+      if (constructor_arguments) {
+        doc_lines = doc_lines.concat(constructor_arguments.map(getArgInDoc));
+      }
+      result.push(getFunction(`let ${definition.name}`, constructor_arguments, null/*return_type*/));
     }
-    result.push(getFunction(`let ${definition.name}`, constructor_arguments, null/*return_type*/));
-  }
 
-  if (definition.inheritance !== null) {
-    result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
+    if (definition.inheritance !== null) {
+      result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
+    }
   }
 
   exposed.forEach((target_class) => {
