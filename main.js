@@ -191,6 +191,15 @@ function getTypeInDoc(type) {
 }
 
 /**
+ * @param {string} generic_type_name
+ * @param {string[]} template_type_names
+ */
+function getGenericTypeInDoc(generic_type_name, template_type_names) {
+  assert(typeof(generic_type_name) === 'string');
+  return generic_type_name + ".<" + template_type_names.join(", ") + ">";
+}
+
+/**
  * @param {WebIDLArgument} arg
  * @returns {string} -- "@param {string|string[]} storeNames"
  */
@@ -335,7 +344,6 @@ function convertInterfaceOperation(interface_name, member) {
  * @returns {string[]}
  */
 function getAllIterators(interface_name, member) {
-  console.log(member);
   assert(member.extAttrs.length === 0);
   if (Array.isArray(member.idlType)) {
     // Map iterators
@@ -345,30 +353,22 @@ function getAllIterators(interface_name, member) {
     let value_type = member.idlType[1];
     let value_array_type = getTypeOfArray(value_type);
     let iterators = [];
+    // TODO: get iterator instead of function
     iterators.push(
-      getDocFromLines([`@returns {${getTypeInDoc(key_array_type)}}`]) + "\n" +
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type)])}}`]) + "\n" +
       getFunction(`${interface_name}.prototype.keys`, [], key_array_type));
     iterators.push(
-      getDocFromLines([`@returns {${getTypeInDoc(value_array_type)}}`]) + "\n" +
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(value_type)])}}`]) + "\n" +
       getFunction(`${interface_name}.prototype.values`, [], value_array_type));
-    iterators.push(getFunction(`${interface_name}.prototype.entries`, [], value_type));
-    // TODO: fix doc and return value of iterator
-    iterators.push(getFunction(`${interface_name}.prototype[Symbol.iterator]`, [], value_type));
+    iterators.push(
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type), getTypeInDoc(value_type)])}}`]) + "\n" +
+      // TODO: fix default value type: [key_type, value_type]
+      getFunction(`${interface_name}.prototype.entries`, [], value_type));
+    iterators.push(
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type), getTypeInDoc(value_type)])}}`]) + "\n" +
+      getFunction(`${interface_name}.prototype[Symbol.iterator]`, [], value_type));
 
-    // [ { sequence: false,
-    //   generic: null,
-    //   nullable: false,
-    //   array: false,
-    //   union: false,
-    //   idlType: 'ByteString' },
-    //   { sequence: false,
-    //     generic: null,
-    //     nullable: false,
-    //     array: false,
-    //     union: false,
-    //     idlType: 'ByteString' } ],
     return iterators;
-
   } else {
     fail("Array iterator is not supported yet");
   }

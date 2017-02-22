@@ -59,17 +59,23 @@ Headers.prototype.has = function (name) { return false; };
 Headers.prototype.set = function (name, value) { return ; };
 
 /**
- * @returns {ByteString[]}
+ * @returns {Iterator.<ByteString>}
  */
 Headers.prototype.keys = function () { return [new ByteString()]; };
 
 /**
- * @returns {ByteString[]}
+ * @returns {Iterator.<ByteString>}
  */
 Headers.prototype.values = function () { return [new ByteString()]; };
 
+/**
+ * @returns {Iterator.<ByteString, ByteString>}
+ */
 Headers.prototype.entries = function () { return new ByteString(); };
 
+/**
+ * @returns {Iterator.<ByteString, ByteString>}
+ */
 Headers.prototype[Symbol.iterator] = function () { return new ByteString(); };
 
 
