@@ -50,7 +50,7 @@ function getTypeOfArray(sub_type) {
     generic: 'sequence',
     nullable: false,
     nullableArray: null,
-    array: (sub_type.array === false ? 1 : sub_type.array + 1),
+    // array: (sub_type.array === false ? 1 : sub_type.array + 1),
     union: false,
     idlType: sub_type,
   };
