@@ -560,6 +560,44 @@ function convertTypeDef(definition) {
   return getDocFromLines(doc);
 }
 
+const BRACKETS = {
+  ')' : '(',
+  ']' : '[',
+  '}' : '{',
+};
+const LEFT_BRACKETS = Object.values(BRACKETS);
+const RIGHT_BRACKETS = Object.keys(BRACKETS);
+/**
+ * @param {string} source_str
+ * @returns {string[]}
+ */
+function slicer(source_str) {
+  source_str = source_str.trim();
+  let result = [];
+  let index = 0;
+  let stack = [];
+  while (index < source_str.length) {
+    let char = source_str[index];
+    if (char === ';') {
+      if (stack.length === 0) {
+        result.push(source_str.substring(0, index + 1));
+        source_str = source_str.substring(index + 1);
+        index = 0;
+        continue;
+      }
+    } else if (LEFT_BRACKETS.indexOf(char) >= 0) {
+      stack.push(char);
+    } else if (RIGHT_BRACKETS.indexOf(char) >= 0) {
+      assert(stack[stack.length - 1] === BRACKETS[char]);
+      stack.pop();
+    }
+    index++;
+  }
+  debugger;
+  assert(source_str.length === 0, source_str);
+  return result;
+}
+
 /**
  * @param {string} source_path
  * @param {string} target_path
@@ -569,9 +607,8 @@ function convertFile(source_path, target_path) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
 
-  let idl_list = fs.readFileSync(source_path, 'utf8')
-    .split("\n\n")
-    .filter(str => str.length > 0);
+  let idl_source = fs.readFileSync(source_path, 'utf8');
+  let idl_list = slicer(idl_source).filter(str => str.trim().length > 0);
   fs.writeFileSync(target_path, "", {flag: 'w'});
 
   idl_list.forEach((idl_str) => {
