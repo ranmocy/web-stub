@@ -61,22 +61,22 @@ Headers.prototype.set = function (name, value) { return ; };
 /**
  * @returns {Iterator.<ByteString>}
  */
-Headers.prototype.keys = function () { return [new ByteString()]; };
+Headers.prototype.keys = function* () { yield new ByteString(); };
 
 /**
  * @returns {Iterator.<ByteString>}
  */
-Headers.prototype.values = function () { return [new ByteString()]; };
+Headers.prototype.values = function* () { yield new ByteString(); };
 
 /**
  * @returns {Iterator.<ByteString, ByteString>}
  */
-Headers.prototype.entries = function () { return new ByteString(); };
+Headers.prototype.entries = function* () { yield [new ByteString(), new ByteString()]; };
 
 /**
  * @returns {Iterator.<ByteString, ByteString>}
  */
-Headers.prototype[Symbol.iterator] = function () { return new ByteString(); };
+Headers.prototype[Symbol.iterator] = function* () { yield [new ByteString(), new ByteString()]; };
 
 
 /**

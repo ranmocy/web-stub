@@ -295,6 +295,18 @@ function getFunction(name, args, return_type) {
 }
 
 /**
+ * @param {string} name
+ * @param {WebIDLType|WebIDLType[]} return_types
+ * @returns {string}
+ */
+function getIterator(name, return_types) {
+  let default_value = Array.isArray(return_types) ?
+    `[${return_types.map(type => getDefaultValueOfType(type)).join(", ")}]` :
+    getDefaultValueOfType(return_types);
+  return `${name} = function* () { yield ${default_value}; };`;
+}
+
+/**
  * @param {string} interface_name
  * @param {WebIDLOperationMember} member
  * @returns {string}
@@ -349,24 +361,20 @@ function getAllIterators(interface_name, member) {
     // Map iterators
     assert(member.idlType.length === 2);
     let key_type = member.idlType[0];
-    let key_array_type = getTypeOfArray(key_type);
     let value_type = member.idlType[1];
-    let value_array_type = getTypeOfArray(value_type);
     let iterators = [];
-    // TODO: get iterator instead of function
     iterators.push(
       getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type)])}}`]) + "\n" +
-      getFunction(`${interface_name}.prototype.keys`, [], key_array_type));
+      getIterator(`${interface_name}.prototype.keys`, key_type));
     iterators.push(
       getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(value_type)])}}`]) + "\n" +
-      getFunction(`${interface_name}.prototype.values`, [], value_array_type));
+      getIterator(`${interface_name}.prototype.values`, value_type));
     iterators.push(
       getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type), getTypeInDoc(value_type)])}}`]) + "\n" +
-      // TODO: fix default value type: [key_type, value_type]
-      getFunction(`${interface_name}.prototype.entries`, [], value_type));
+      getIterator(`${interface_name}.prototype.entries`, [key_type, value_type]));
     iterators.push(
       getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type), getTypeInDoc(value_type)])}}`]) + "\n" +
-      getFunction(`${interface_name}.prototype[Symbol.iterator]`, [], value_type));
+      getIterator(`${interface_name}.prototype[Symbol.iterator]`, [key_type, value_type]));
 
     return iterators;
   } else {
