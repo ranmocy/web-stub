@@ -1,5 +1,6 @@
 "use strict";
 
+/** @type {WebIDL2} */
 const WebIDL2 = require("webidl2");
 const fs = require('fs');
 const assert_ext = require('assert');
@@ -170,7 +171,16 @@ function getTypeInDoc(type) {
     assert(!type.sequence);
     assert(type.idlType.length === 2);
     doc += `Object.<${getTypeInDoc(type.idlType[0])}, ${getTypeInDoc(type.idlType[1])}>`
+  } else if (type.generic === 'Promise') {
+    assert(!type.union);
+    assert(!type.sequence);
+    assert(!Array.isArray(type.idlType));
+    doc += `Promise.<${getTypeInDoc(type.idlType)}>`;
   } else {
+    assert(!type.union);
+    assert(!type.sequence);
+    assert(type.generic === null);
+    assert(typeof(type.idlType) === 'string');
     doc += getTypePlainName(type.idlType);
   }
   return doc;
@@ -271,10 +281,21 @@ function convertInterfaceOperation(interface_name, member) {
   assert(!member.deleter);
   assert(!member.legacycaller);
   assert(!member.stringifier);
-  assert(member.extAttrs.length === 0, member.extAttrs);
   if (interface_name === null) {
     assert(!member.static);
   }
+
+  member.extAttrs.forEach(attr => {
+    switch (attr.name) {
+      case 'NewObject': {
+        // By default we always create new object, no op here
+        break;
+      }
+      default: {
+        fail("Un-supported attr:" + attr.name, attr);
+      }
+    }
+  });
 
   let result = [];
   let doc_lines = member.arguments.map(getArgInDoc)
@@ -362,6 +383,8 @@ function convertInterface(definition) {
           exposed = [attr.rhs.value];
         } else if (attr.rhs.type === 'identifier-list') {
           exposed = attr.rhs.value;
+        } else {
+          fail("Unknown Exposed attr", attr);
         }
         break;
       }
@@ -393,7 +416,7 @@ function convertInterface(definition) {
   }
 
   exposed.forEach((target_class) => {
-    result.push(`${target_class}.prototype.${definition.name} = ${definition};`);
+    result.push(`${target_class}.prototype.${definition.name} = ${definition.name};`);
   });
 
   let interface_part = [getDocFromLines(doc_lines)].concat(result).join("\n");
@@ -552,16 +575,16 @@ function convertFile(source_path, target_path) {
   fs.writeFileSync(target_path, "", {flag: 'w'});
 
   idl_list.forEach((idl_str) => {
-    console.log("==================");
+    console.log(">>>>>>>>>>>>>>>>>>");
     console.log(idl_str);
+    console.log("==================");
 
-    let definition = WebIDL2.parse(idl_str);
-    if (definition.length === 0) {
+    let definitions = WebIDL2.parse(idl_str);
+    if (definitions.length === 0) {
       return;
     }
-    assert(definition.length === 1, definition.length);
-    /** @type [WebIDLDefinition] */
-    definition = definition[0];
+    assert(definitions.length === 1, definitions.length);
+    let definition = definitions[0];
 
     let doc = getDocFromLines(idl_str.split("\n"));
     let str;
@@ -592,6 +615,10 @@ function convertFile(source_path, target_path) {
     }
     let definition_result = doc + "\n" + str + "\n";
     console.log(definition_result);
+    console.log("<<<<<<<<<<<<<<<<<<");
+    if (definition_result.match(/\[object Object]/)) {
+      fail("definition_result contains [object Object]!");
+    }
     fs.writeFileSync(target_path, definition_result + "\n\n", {flag: 'a'});
   });
 }
@@ -618,9 +645,8 @@ function convertDir(source_root, target_root, ignore_error) {
       try {
         convertFile(source, target.replace(".webidl", ".js"));
       } catch (e) {
-        if (isDefined(ignore_error)) {
-          console.log(e);
-        } else {
+        console.log("Exception in convertFile:", e, e.stack);
+        if (!isDefined(ignore_error)) {
           throw e;
         }
       }
