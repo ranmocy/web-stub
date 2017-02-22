@@ -508,7 +508,8 @@ ResponseInit.headers = new HeadersInit();
 
 
 /**
- * partial interface WindowOrWorkerGlobalScope {  [NewObject] Promise<Response> fetch(RequestInfo input, optional RequestInit init);
+ * partial interface WindowOrWorkerGlobalScope {
+ *   [NewObject] Promise<Response> fetch(RequestInfo input, optional RequestInit init);
  * };
  */
 

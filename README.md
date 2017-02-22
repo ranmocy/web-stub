@@ -22,7 +22,7 @@ Params validation
 # Usage
 
 Clone this library to local `git clone https://github.com/ranmocy/web-interface.git`.
-Setup your IDE to add `web-interface/js` folder to be a library.
+Setup your IDE to add `web-interface/js` folder or any JS file under it to be a library.
 Note: Do not include this folder to your production code. This is for IDE only.
 
 WebStorm:
@@ -30,8 +30,10 @@ WebStorm:
 
 # Supported API
 
-1. [IndexedDB](https://www.w3.org/TR/IndexedDB/)
-2. ...Upcoming
+* [WebIDL2](https://github.com/w3c/webidl2.js)
+* [IndexedDB](https://www.w3.org/TR/IndexedDB/)
+* [Fetch](https://fetch.spec.whatwg.org/)
+* ...Upcoming
 
 # Dev
 
@@ -45,8 +47,8 @@ To test: `node . all && if ! git diff-index --quiet HEAD; then exit 1; fi`
 
 ## Deps
 
-1. [WebIDL2](https://github.com/w3c/webidl2.js)
-2. [webidl-extract](https://github.com/AndreasMadsen/webidl-extract)
+* [WebIDL2](https://github.com/w3c/webidl2.js)
+* [webidl-extract](https://github.com/AndreasMadsen/webidl-extract)
 
 # Contribution
 

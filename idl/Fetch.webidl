@@ -96,6 +96,7 @@ dictionary ResponseInit {
 
 enum ResponseType { "basic", "cors", "default", "error", "opaque", "opaqueredirect" };
 
-partial interface WindowOrWorkerGlobalScope {  [NewObject] Promise<Response> fetch(RequestInfo input, optional RequestInit init);
+partial interface WindowOrWorkerGlobalScope {
+  [NewObject] Promise<Response> fetch(RequestInfo input, optional RequestInit init);
 };
 
