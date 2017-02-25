@@ -37,7 +37,7 @@ WebStorm:
 
 # Dev
 
-Install deps: `npm install`
+Install dependencies: `npm install`
 
 To get WebIDL: `node . update`
 
@@ -45,7 +45,7 @@ To generate JS files from WebIDL: `node .`
 
 To test: `node . all && if ! git diff-index --quiet HEAD; then exit 1; fi`
 
-## Deps
+## Dependencies
 
 * [WebIDL2](https://github.com/w3c/webidl2.js)
 * [webidl-extract](https://github.com/AndreasMadsen/webidl-extract)
