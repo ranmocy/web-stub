@@ -749,15 +749,15 @@ function convertDir(source_root, target_root, ignore_error) {
 
 const exec = require( 'child_process' ).exec;
 const URL_TO_IDL = {
-  "https://www.w3.org/TR/IndexedDB/" : "idl/IndexedDB.webidl",
-  "https://fetch.spec.whatwg.org/" : "idl/Fetch.webidl",
+  "https://www.w3.org/TR/IndexedDB/" : "IndexedDB.webidl",
+  "https://fetch.spec.whatwg.org/" : "Fetch.webidl",
 };
 /**
  * @returns {undefined} 
  */
 function updateIDL() {
   for (let url of Object.keys(URL_TO_IDL)) {
-    let path = URL_TO_IDL[url];
+    let path = "idl/" + URL_TO_IDL[url];
     console.log('update', url, '=>', path);
     exec(`curl ${url} | node_modules/webidl-extract/cli.js > ${path}`);
   }
