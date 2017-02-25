@@ -199,7 +199,7 @@ Request.prototype.method = new ByteString();
 Request.prototype.url = new USVString();
 
 /**
- * [SameObject]
+ * [SameObject] -- It will always return the same object
  * @type {Headers}
  * @readonly
  */
@@ -438,14 +438,14 @@ Response.prototype.ok = false;
 Response.prototype.statusText = new ByteString();
 
 /**
- * [SameObject]
+ * [SameObject] -- It will always return the same object
  * @type {Headers}
  * @readonly
  */
 Response.prototype.headers = new Headers();
 
 /**
- * [SameObject]
+ * [SameObject] -- It will always return the same object
  * @type {Promise.<Headers>}
  * @readonly
  */

@@ -253,8 +253,13 @@ function convertInterfaceAttribute(interface_name, member) {
   member.extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'SameObject': {
-        // By default we always use the same object, no op here
-        doc_lines.push(`[SameObject]`);
+        assert(attr.arguments === null);
+        doc_lines.push(`[SameObject] -- It will always return the same object`);
+        break;
+      }
+      case 'LenientThis': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[LenientThis] -- This method is only accessible on object that implements this interface. Not on its prototype.`);
         break;
       }
       default: {
