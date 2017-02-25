@@ -44,21 +44,21 @@ function getDocFromLines(lines) {
   return `/**\n${doc}\n */`;
 }
 
-/**
- * @param {WebIDLType} sub_type
- * @returns {WebIDLType}
- */
-function getTypeOfArray(sub_type) {
-  return {
-    sequence: true,
-    generic: 'sequence',
-    nullable: false,
-    nullableArray: null,
-    // array: (sub_type.array === false ? 1 : sub_type.array + 1),
-    union: false,
-    idlType: sub_type,
-  };
-}
+// /**
+//  * @param {WebIDLType} sub_type
+//  * @returns {WebIDLType}
+//  */
+// function getTypeOfArray(sub_type) {
+//   return {
+//     sequence: true,
+//     generic: 'sequence',
+//     nullable: false,
+//     nullableArray: null,
+//     // array: (sub_type.array === false ? 1 : sub_type.array + 1),
+//     union: false,
+//     idlType: sub_type,
+//   };
+// }
 
 /**
  * @param {WebIDLSimpleType} idlType
@@ -534,18 +534,18 @@ function getDictFieldInDoc(field) {
   return doc.join("");
 }
 
-/**
- * @param {string} dict_name
- * @param {WebIDLDictionaryMember} field
- * @returns {string}
- */
-function convertDictField(dict_name, field) {
-  assert(field.type === 'field');
-  let default_value = typeof(field.default) !== 'undefined' ?
-    getDefaultValueOfDefault(field.default) :
-    getDefaultValueOfType(field.idlType);
-  return `${dict_name}.${field.name} = ${default_value};`;
-}
+// /**
+//  * @param {string} dict_name
+//  * @param {WebIDLDictionaryMember} field
+//  * @returns {string}
+//  */
+// function convertDictField(dict_name, field) {
+//   assert(field.type === 'field');
+//   let default_value = typeof(field.default) !== 'undefined' ?
+//     getDefaultValueOfDefault(field.default) :
+//     getDefaultValueOfType(field.idlType);
+//   return `${dict_name}.${field.name} = ${default_value};`;
+// }
 
 /**
  * @param {WebIDLDictionary} definition
@@ -561,21 +561,21 @@ function convertDict(definition) {
   ].concat(definition.members.map(getDictFieldInDoc));
   result.push(getDocFromLines(doc_lines));
 
-  result.push(`let ${definition.name} = {};`);
-  if (definition.inheritance) {
-    assert(typeof(definition.inheritance) === 'string');
-    result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
-  }
-  result = result.concat(definition.members.map((member) => {
-    switch (member.type) {
-      case 'field': {
-        return convertDictField(definition.name, member);
-      }
-      default: {
-        fail("Un-supported dict member type" + member.type, member);
-      }
-    }
-  }));
+  // result.push(`let ${definition.name} = {};`);
+  // if (definition.inheritance) {
+  //   assert(typeof(definition.inheritance) === 'string');
+  //   result.push(`${definition.name}.prototype = new ${definition.inheritance}();`);
+  // }
+  // result = result.concat(definition.members.map((member) => {
+  //   switch (member.type) {
+  //     case 'field': {
+  //       return convertDictField(definition.name, member);
+  //     }
+  //     default: {
+  //       fail("Un-supported dict member type" + member.type, member);
+  //     }
+  //   }
+  // }));
 
   return result.join("\n");
 }

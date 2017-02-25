@@ -312,19 +312,6 @@ Request.prototype = Body.prototype;
  * @property {boolean} [keepalive]
  * @property {*} [window]
  */
-let RequestInit = {};
-RequestInit.method = new ByteString();
-RequestInit.headers = new HeadersInit();
-RequestInit.body = null;
-RequestInit.referrer = new USVString();
-RequestInit.referrerPolicy = new ReferrerPolicy();
-RequestInit.mode = new RequestMode();
-RequestInit.credentials = new RequestCredentials();
-RequestInit.cache = new RequestCache();
-RequestInit.redirect = new RequestRedirect();
-RequestInit.integrity = "";
-RequestInit.keepalive = false;
-RequestInit.window = {};
 
 
 /**
@@ -493,10 +480,6 @@ Response.prototype = Body.prototype;
  * @property {ByteString} [statusText='OK']
  * @property {HeadersInit} [headers]
  */
-let ResponseInit = {};
-ResponseInit.status = 200;
-ResponseInit.statusText = 'OK';
-ResponseInit.headers = new HeadersInit();
 
 
 /**

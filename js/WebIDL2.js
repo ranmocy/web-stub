@@ -44,14 +44,6 @@ WebIDL2.prototype.parse = function (idl_string) { return [new WebIDLDefinition()
  * @property {boolean} [union=false]
  * @property {(string|WebIDLType[]|WebIDLType)} [idlType='void']
  */
-let WebIDLType = {};
-WebIDLType.sequence = false;
-WebIDLType.generic = null;
-WebIDLType.nullable = false;
-WebIDLType.nullableArray = null;
-WebIDLType.array = false;
-WebIDLType.union = false;
-WebIDLType.idlType = 'void';
 
 
 /**
@@ -81,13 +73,6 @@ WebIDLType.idlType = 'void';
  * @property {?string} [inheritance=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLInterface = {};
-WebIDLInterface.type = 'interface';
-WebIDLInterface.name = "";
-WebIDLInterface.partial = false;
-WebIDLInterface.members = [new WebIDLInterfaceMember()];
-WebIDLInterface.inheritance = null;
-WebIDLInterface.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -121,15 +106,6 @@ WebIDLInterface.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {string} [name]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLAttributeMember = {};
-WebIDLAttributeMember.type = 'attribute';
-WebIDLAttributeMember.static = false;
-WebIDLAttributeMember.stringifier = false;
-WebIDLAttributeMember.inherit = false;
-WebIDLAttributeMember.readonly = false;
-WebIDLAttributeMember.idlType = new WebIDLType();
-WebIDLAttributeMember.name = "";
-WebIDLAttributeMember.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -151,13 +127,6 @@ WebIDLAttributeMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {WebIDLConstValue} [value]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLConstantMember = {};
-WebIDLConstantMember.type = 'const';
-WebIDLConstantMember.nullable = false;
-WebIDLConstantMember.idlType = new WebIDLSimpleType();
-WebIDLConstantMember.name = "";
-WebIDLConstantMember.value = new WebIDLConstValue();
-WebIDLConstantMember.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -191,19 +160,6 @@ WebIDLConstantMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {WebIDLArgument[]} [arguments]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLOperationMember = {};
-WebIDLOperationMember.type = 'operation';
-WebIDLOperationMember.getter = false;
-WebIDLOperationMember.setter = false;
-WebIDLOperationMember.creator = false;
-WebIDLOperationMember.deleter = false;
-WebIDLOperationMember.legacycaller = false;
-WebIDLOperationMember.static = false;
-WebIDLOperationMember.stringifier = false;
-WebIDLOperationMember.idlType = new WebIDLType();
-WebIDLOperationMember.name = "";
-WebIDLOperationMember.arguments = [new WebIDLArgument()];
-WebIDLOperationMember.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -225,13 +181,6 @@ WebIDLOperationMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {string} [name]
  * @property {WebIDLConstValue} [default]
  */
-let WebIDLArgument = {};
-WebIDLArgument.optional = false;
-WebIDLArgument.variadic = true;
-WebIDLArgument.extAttrs = [new WebIDLExtendedAttribute()];
-WebIDLArgument.idlType = new WebIDLType();
-WebIDLArgument.name = "";
-WebIDLArgument.default = new WebIDLConstValue();
 
 
 /**
@@ -263,18 +212,6 @@ WebIDLArgument.default = new WebIDLConstValue();
  * @property {?string} [iteratorObject=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLIteratorMember = {};
-WebIDLIteratorMember.type = 'iterator';
-WebIDLIteratorMember.getter = false;
-WebIDLIteratorMember.setter = false;
-WebIDLIteratorMember.creator = false;
-WebIDLIteratorMember.deleter = false;
-WebIDLIteratorMember.legacycaller = false;
-WebIDLIteratorMember.static = false;
-WebIDLIteratorMember.stringifier = false;
-WebIDLIteratorMember.idlType = new WebIDLType();
-WebIDLIteratorMember.iteratorObject = null;
-WebIDLIteratorMember.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -292,11 +229,6 @@ WebIDLIteratorMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {boolean} [readonly=false]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLIterable = {};
-WebIDLIterable.type = new WebIDLIterableType();
-WebIDLIterable.idlType = null;
-WebIDLIterable.readonly = false;
-WebIDLIterable.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -326,12 +258,6 @@ WebIDLIterable.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {WebIDLArgument[]} [arguments]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLCallback = {};
-WebIDLCallback.type = 'callback';
-WebIDLCallback.name = "";
-WebIDLCallback.idlType = new WebIDLType();
-WebIDLCallback.arguments = [new WebIDLArgument()];
-WebIDLCallback.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -353,13 +279,6 @@ WebIDLCallback.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {?string} [inheritance=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLDictionary = {};
-WebIDLDictionary.type = 'dictionary';
-WebIDLDictionary.name = "";
-WebIDLDictionary.partial = false;
-WebIDLDictionary.members = [new WebIDLDictionaryMember()];
-WebIDLDictionary.inheritance = null;
-WebIDLDictionary.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -381,13 +300,6 @@ WebIDLDictionary.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  * @property {WebIDLConstValue} [default]
  */
-let WebIDLDictionaryMember = {};
-WebIDLDictionaryMember.type = 'field';
-WebIDLDictionaryMember.name = "";
-WebIDLDictionaryMember.required = false;
-WebIDLDictionaryMember.idlType = new WebIDLType();
-WebIDLDictionaryMember.extAttrs = [new WebIDLExtendedAttribute()];
-WebIDLDictionaryMember.default = new WebIDLConstValue();
 
 
 /**
@@ -407,12 +319,6 @@ WebIDLDictionaryMember.default = new WebIDLConstValue();
  * @property {?string} [inheritance=null]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLException = {};
-WebIDLException.type = 'exception';
-WebIDLException.name = "";
-WebIDLException.members = [new WebIDLExceptionMember()];
-WebIDLException.inheritance = null;
-WebIDLException.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -430,11 +336,6 @@ WebIDLException.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {WebIDLType} [idlType]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLExceptionMember = {};
-WebIDLExceptionMember.type = 'field';
-WebIDLExceptionMember.name = "";
-WebIDLExceptionMember.idlType = new WebIDLType();
-WebIDLExceptionMember.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -452,11 +353,6 @@ WebIDLExceptionMember.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {string[]} [values]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLEnum = {};
-WebIDLEnum.type = 'enum';
-WebIDLEnum.name = "";
-WebIDLEnum.values = [""];
-WebIDLEnum.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -476,12 +372,6 @@ WebIDLEnum.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {string} [name]
  * @property {WebIDLExtendedAttribute[]} [typeExtAttrs]
  */
-let WebIDLTypeDef = {};
-WebIDLTypeDef.type = 'typedef';
-WebIDLTypeDef.extAttrs = [new WebIDLExtendedAttribute()];
-WebIDLTypeDef.idlType = new WebIDLType();
-WebIDLTypeDef.name = "";
-WebIDLTypeDef.typeExtAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -499,11 +389,6 @@ WebIDLTypeDef.typeExtAttrs = [new WebIDLExtendedAttribute()];
  * @property {string} [implements]
  * @property {WebIDLExtendedAttribute[]} [extAttrs]
  */
-let WebIDLImplements = {};
-WebIDLImplements.type = 'implements';
-WebIDLImplements.target = "";
-WebIDLImplements.implements = "";
-WebIDLImplements.extAttrs = [new WebIDLExtendedAttribute()];
 
 
 /**
@@ -522,10 +407,6 @@ WebIDLImplements.extAttrs = [new WebIDLExtendedAttribute()];
  * @property {*} [value]
  * @property {boolean} [negative]
  */
-let WebIDLConstValue = {};
-WebIDLConstValue.type = new WebIDLConstValueType();
-WebIDLConstValue.value = {};
-WebIDLConstValue.negative = false;
 
 
 /**
@@ -553,11 +434,6 @@ WebIDLConstValue.negative = false;
  * @property {?WebIDLExtendedAttributeRHS} [rhs]
  * @property {?Object.<string, WebIDLType>} [typePair]
  */
-let WebIDLExtendedAttribute = {};
-WebIDLExtendedAttribute.name = "";
-WebIDLExtendedAttribute.arguments = null;
-WebIDLExtendedAttribute.rhs = null;
-WebIDLExtendedAttribute.typePair = null;
 
 
 /**
@@ -571,9 +447,6 @@ WebIDLExtendedAttribute.typePair = null;
  * @property {WebIDLExtendedAttributeRHSType} [type]
  * @property {string} [value]
  */
-let WebIDLExtendedAttributeRHS = {};
-WebIDLExtendedAttributeRHS.type = new WebIDLExtendedAttributeRHSType();
-WebIDLExtendedAttributeRHS.value = "";
 
 
 /**

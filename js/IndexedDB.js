@@ -116,9 +116,6 @@ IDBKeyRange.bound = function (lower, upper, lowerOpen, upperOpen) { return new I
  * @property {?(string|string[])} [keyPath=null]
  * @property {boolean} [autoIncrement=false]
  */
-let IDBObjectStoreParameters = {};
-IDBObjectStoreParameters.keyPath = null;
-IDBObjectStoreParameters.autoIncrement = false;
 
 
 /**
@@ -132,9 +129,6 @@ IDBObjectStoreParameters.autoIncrement = false;
  * @property {boolean} [unique=false]
  * @property {boolean} [multiEntry=false]
  */
-let IDBIndexParameters = {};
-IDBIndexParameters.unique = false;
-IDBIndexParameters.multiEntry = false;
 
 
 /**
@@ -148,10 +142,6 @@ IDBIndexParameters.multiEntry = false;
  * @property {number} [oldVersion=0]
  * @property {?number} [newVersion=null]
  */
-let IDBVersionChangeEventInit = {};
-IDBVersionChangeEventInit.prototype = new EventInit();
-IDBVersionChangeEventInit.oldVersion = 0;
-IDBVersionChangeEventInit.newVersion = null;
 
 
 /**
