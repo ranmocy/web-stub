@@ -612,6 +612,36 @@ function convertTypeDef(definition) {
   return getDocFromLines(doc);
 }
 
+/**
+ * @param {WebIDLCallback} definition
+ */
+function convertCallback(definition) {
+  let result = [];
+  let doc_lines = [];
+
+  definition.extAttrs.forEach(extAttr => {
+    switch (extAttr.name) {
+      case 'TreatNonObjectAsNull':
+        doc_lines.push("[TreatNonObjectAsNull]");
+        break;
+      default:
+        fail("Unknown callback extAttr", extAttr);
+    }
+  });
+
+  doc_lines.push(`@callback ${definition.name}`);
+  doc_lines = doc_lines.concat(definition.arguments.map(getArgInDoc));
+  doc_lines.push(`@returns {${getTypeInDoc(definition.idlType)}}`);
+  result.push(getDocFromLines(doc_lines));
+
+  result.push(getFunction(
+    `let ${definition.name}`,
+    definition.arguments,
+    definition.idlType));
+
+  return result.join("\n");
+}
+
 const BRACKETS = {
   ')' : '(',
   ']' : '[',
@@ -698,6 +728,10 @@ function convertFile(source_path, target_path) {
         str = convertTypeDef(definition);
         break;
       }
+      case 'callback': {
+        str = convertCallback(definition);
+        break;
+      }
       default: {
         fail("Un-supported type:" + definition.type, definition);
       }
@@ -751,6 +785,7 @@ const exec = require( 'child_process' ).exec;
 const URL_TO_IDL = {
   "https://www.w3.org/TR/IndexedDB/" : "IndexedDB.webidl",
   "https://fetch.spec.whatwg.org/" : "Fetch.webidl",
+  "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI.webidl",
 };
 /**
  * @returns {undefined} 
