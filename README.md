@@ -31,6 +31,7 @@ WebStorm:
 # Supported API
 
 * [WebIDL2](https://github.com/w3c/webidl2.js)
+* [WebAppAPI]("https://www.w3.org/TR/html51/webappapis.html")
 * [IndexedDB](https://www.w3.org/TR/IndexedDB/)
 * [Fetch](https://fetch.spec.whatwg.org/)
 * ...Upcoming
