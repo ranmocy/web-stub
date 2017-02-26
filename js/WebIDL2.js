@@ -40,7 +40,7 @@ WebIDL2.prototype.parse = function (idl_string) { return [new WebIDLDefinition()
  * @property {?string} [generic=null]
  * @property {boolean} [nullable=false]
  * @property {boolean[]} [nullableArray=null]
- * @property {(boolean|unsigned short)} [array=false]
+ * @property {(boolean|number)} [array=false]
  * @property {boolean} [union=false]
  * @property {(string|WebIDLType[]|WebIDLType)} [idlType='void']
  */

@@ -1,5 +1,16 @@
 "use strict";
 
+const RESET = "\x1b[0m";
+const BLACK = "\x1b[30m";
+const RED = "\x1b[31m";
+const GREEN = "\x1b[32m";
+const YELLOW = "\x1b[33m";
+const BLUE = "\x1b[34m";
+const MAGENTA = "\x1b[35m";
+const CYAN = "\x1b[36m";
+const WHITE = "\x1b[37m";
+
+
 /** @type {WebIDL2} */
 const WebIDL2 = require("webidl2");
 const fs = require('fs');
@@ -18,7 +29,7 @@ function isDefined(obj) {
  * @param {Object} [obj]
  */
 function assert(condition, obj) {
-  assert_ext(condition, JSON.stringify(obj));
+  assert_ext(condition, `${YELLOW}${JSON.stringify(obj)}${RESET}`);
 }
 
 /**
@@ -26,7 +37,7 @@ function assert(condition, obj) {
  * @param {Object} [obj]
  */
 function fail(msg, obj) {
-  assert_ext(false, msg + ", " + JSON.stringify(obj));
+  assert_ext(false, `${MAGENTA}${msg}, ${CYAN}${JSON.stringify(obj)}${RESET}`);
 }
 
 /**
@@ -71,6 +82,8 @@ function getDefaultValueObj(idlType) {
     case 'void':
       return '';
     case 'short':
+    case 'long':
+    case 'long long':
     case 'unsigned short':
     case 'unsigned long':
     case 'unsigned long long':
@@ -94,16 +107,27 @@ function getDefaultValueOfType(type) {
     return `${getDefaultValueObj(type)}`;
   }
 
-  assert(!type.array);
   if (type.nullable || type.union) {
     return 'null';
   }
-  if (type.idlType === 'void') {
+
+  assert(isDefined(type.idlType));
+  let value = getDefaultValueOfType(type.idlType);
+
+  let array = 0;
+  if (type.sequence) {
+    assert(type.idlType !== 'void');
+    assert(!type.array, type);
+    array = 1;
+  } else if (type.array) {
     assert(!type.sequence);
+    array = type.array;
+  }
+  for (let i = 0; i < array; i++) {
+    value = `[${value}]`;
   }
 
-  let obj = getDefaultValueOfType(type.idlType);
-  return type.sequence ? `[${obj}]` : `${obj}`;
+  return value;
 }
 
 /**
@@ -142,6 +166,9 @@ function getTypePlainName(idlType) {
     case 'any':
       return '*';
     case 'short':
+    case 'long':
+    case 'long long':
+    case 'unsigned short':
     case 'unsigned long':
     case 'unsigned long long':
       return 'number';
@@ -153,37 +180,50 @@ function getTypePlainName(idlType) {
 }
 
 /**
- * @param {WebIDLType} type
+ * @param {WebIDLType|WebIDLSimpleType} type
  * @returns {string} -- "string|string[]"
  */
 function getTypeInDoc(type) {
-  assert(!type.array);
+  if (typeof(type) === 'string') {
+    return type;
+  }
 
   let doc = type.nullable ? "?" : "";
   if (type.union) {
+    assert(!type.array, type);
     assert(!type.sequence);
     assert(type.generic === null);
     assert((typeof(type['default']) === 'undefined'));
     assert(Array.isArray(type.idlType));
     doc += "(" + type.idlType.map(getTypeInDoc).join("|") + ")";
+  } else if (type.array) {
+    assert(!type.sequence);
+    assert(!type.union);
+    assert(type.generic === null);
+    assert((typeof(type['default']) === 'undefined'));
+    doc += getTypeInDoc(type.idlType) + '[]';
   } else if (type.sequence) {
+    assert(!type.array, type);
     assert(!type.union);
     assert(type.generic === 'sequence');
     doc += getTypeInDoc(type.idlType) + '[]';
   } else if (type.generic === 'record') {
+    assert(!type.array, type);
     assert(!type.union);
     assert(!type.sequence);
     assert(type.idlType.length === 2);
     doc += `Object.<${getTypeInDoc(type.idlType[0])}, ${getTypeInDoc(type.idlType[1])}>`
   } else if (type.generic === 'Promise') {
+    assert(!type.array, type);
     assert(!type.union);
     assert(!type.sequence);
     assert(!Array.isArray(type.idlType));
     doc += `Promise.<${getTypeInDoc(type.idlType)}>`;
   } else {
+    assert(!type.array, type);
     assert(!type.union);
     assert(!type.sequence);
-    assert(type.generic === null);
+    assert(type.generic === null, type);
     assert(typeof(type.idlType) === 'string');
     doc += getTypePlainName(type.idlType);
   }
@@ -204,8 +244,6 @@ function getGenericTypeInDoc(generic_type_name, template_type_names) {
  * @returns {string} -- "@param {string|string[]} storeNames"
  */
 function getArgInDoc(arg) {
-  assert(!arg.variadic);
-
   let arg_name = arg.name;
   if (typeof(arg.default) !== 'undefined') {
     arg_name += `=${getDefaultValueOfDefault(arg.default)}`;
@@ -214,8 +252,13 @@ function getArgInDoc(arg) {
     arg_name = `[${arg_name}]`;
   }
 
+  let type_doc = getTypeInDoc(arg.idlType);
+  if (arg.variadic) {
+    type_doc = `...${type_doc}`;
+  }
+
   let doc = [];
-  doc.push(`@param {${getTypeInDoc(arg.idlType)}} `);
+  doc.push(`@param {${type_doc}} `);
   doc.push(arg_name);
   if (arg.extAttrs.length > 0) {
     doc.push(' -- ');
@@ -249,6 +292,7 @@ function convertInterfaceAttribute(interface_name, member) {
 
   let result = [];
   let doc_lines = [];
+  let exposed = [];
 
   member.extAttrs.forEach(attr => {
     switch (attr.name) {
@@ -260,6 +304,18 @@ function convertInterfaceAttribute(interface_name, member) {
       case 'LenientThis': {
         assert(attr.arguments === null);
         doc_lines.push(`[LenientThis] -- This method is only accessible on object that implements this interface. Not on its prototype.`);
+        break;
+      }
+      case 'Exposed': {
+        assert(attr.arguments === null);
+        if (attr.rhs.type === 'identifier') {
+          assert(typeof(attr.rhs.value) === 'string');
+          exposed = [attr.rhs.value];
+        } else if (attr.rhs.type === 'identifier-list') {
+          exposed = attr.rhs.value;
+        } else {
+          fail("Unknown Exposed attr", attr);
+        }
         break;
       }
       default: {
@@ -274,9 +330,13 @@ function convertInterfaceAttribute(interface_name, member) {
   }
   result.push(getDocFromLines(doc_lines));
 
-  result.push(
-    `${interface_name}${member.static ? '' : '.prototype'}.${member.name}` +
-    ` = ${getDefaultValueOfType(member.idlType)};`);
+  let member_definition_name = `${interface_name}${member.static ? '' : '.prototype'}.${member.name}`;
+  result.push(`${member_definition_name} = ${getDefaultValueOfType(member.idlType)};`);
+
+  exposed.forEach(target => {
+    result.push(`${target}${member.static ? '' : '.prototype'}.${member.name} = ${member_definition_name}`);
+  });
+
   return result.join("\n");
 }
 
@@ -317,8 +377,6 @@ function getIterator(name, return_types) {
  * @returns {string}
  */
 function convertInterfaceOperation(interface_name, member) {
-  assert(!member.getter);
-  assert(!member.setter);
   assert(!member.creator);
   assert(!member.deleter);
   assert(!member.legacycaller);
@@ -342,6 +400,16 @@ function convertInterfaceOperation(interface_name, member) {
       }
     }
   });
+
+  if (member.getter) {
+    assert(!member.setter);
+    doc_lines.push(`@getter`);
+  }
+
+  if (member.setter) {
+    assert(!member.getter);
+    doc_lines.push(`@setter`);
+  }
 
   doc_lines = doc_lines.concat(member.arguments.map(getArgInDoc));
   doc_lines.push(`@returns {${getTypeInDoc(member.idlType)}}`);
@@ -773,8 +841,9 @@ function convertDir(source_root, target_root, ignore_error) {
       try {
         convertFile(source, target.replace(".webidl", ".js"));
       } catch (e) {
-        console.log("Exception in convertFile:", e, e.stack);
-        if (!isDefined(ignore_error)) {
+        if (isDefined(ignore_error)) {
+          console.log("Exception in convertFile:", e, e.stack);
+        } else {
           throw e;
         }
       }
@@ -793,7 +862,7 @@ const URL_TO_IDL = {
   "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI.webidl",
 };
 /**
- * @returns {undefined} 
+ * @returns {undefined}
  */
 function updateIDL() {
   for (let url of Object.keys(URL_TO_IDL)) {

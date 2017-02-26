@@ -396,7 +396,7 @@ Response.error = function () { return new Response(); };
 /**
  * [NewObject]
  * @param {USVString} url
- * @param {unsigned short} [status=302]
+ * @param {number} [status=302]
  * @returns {Response}
  */
 Response.redirect = function (url, status) { return new Response(); };
@@ -420,7 +420,7 @@ Response.prototype.url = new USVString();
 Response.prototype.redirected = false;
 
 /**
- * @type {unsigned short}
+ * @type {number}
  * @readonly
  */
 Response.prototype.status = 0;
@@ -476,7 +476,7 @@ Response.prototype = Body.prototype;
  */
 /**
  * @typedef {Object} ResponseInit
- * @property {unsigned short} [status=200]
+ * @property {number} [status=200]
  * @property {ByteString} [statusText='OK']
  * @property {HeadersInit} [headers]
  */

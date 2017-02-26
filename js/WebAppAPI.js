@@ -726,3 +726,574 @@ Window.prototype = WindowBase64.prototype;
 WorkerGlobalScope.prototype = WindowBase64.prototype;
 
 
+/**
+ * [NoInterfaceObject, Exposed=(Window,Worker)]
+ * interface WindowTimers {
+ *   long setTimeout((Function or DOMString) handler, optional long timeout = 0, any... arguments);
+ *   void clearTimeout(optional long handle = 0);
+ *   long setInterval((Function or DOMString) handler, optional long timeout = 0, any... arguments);
+ *   void clearInterval(optional long handle = 0);
+ * };
+ */
+/**
+ * @interface WindowTimers
+ */
+let WindowTimers = {};
+Window.prototype.WindowTimers = WindowTimers;
+Worker.prototype.WindowTimers = WindowTimers;
+
+/**
+ * @param {(Function|string)} handler
+ * @param {number} [timeout=0]
+ * @param {...*} arguments
+ * @returns {number}
+ */
+WindowTimers.prototype.setTimeout = function (handler, timeout, arguments) { return 0; };
+
+/**
+ * @param {number} [handle=0]
+ * @returns {void}
+ */
+WindowTimers.prototype.clearTimeout = function (handle) { return ; };
+
+/**
+ * @param {(Function|string)} handler
+ * @param {number} [timeout=0]
+ * @param {...*} arguments
+ * @returns {number}
+ */
+WindowTimers.prototype.setInterval = function (handler, timeout, arguments) { return 0; };
+
+/**
+ * @param {number} [handle=0]
+ * @returns {void}
+ */
+WindowTimers.prototype.clearInterval = function (handle) { return ; };
+
+
+/**
+ * Window implements WindowTimers;
+ */
+/**
+ * @implements {WindowTimers}
+ */
+Window.prototype = WindowTimers.prototype;
+
+
+/**
+ * WorkerGlobalScope implements WindowTimers;
+ */
+/**
+ * @implements {WindowTimers}
+ */
+WorkerGlobalScope.prototype = WindowTimers.prototype;
+
+
+/**
+ * [NoInterfaceObject]
+ * interface WindowModal {
+ *   readonly attribute any dialogArguments;
+ *   attribute any returnValue;
+ * };
+ */
+/**
+ * @interface WindowModal
+ */
+let WindowModal = {};
+
+/**
+ * @type {*}
+ * @readonly
+ */
+WindowModal.prototype.dialogArguments = {};
+
+/**
+ * @type {*}
+ */
+WindowModal.prototype.returnValue = {};
+
+
+/**
+ * interface Navigator {
+ *   // objects implementing this interface also implement the interfaces given below
+ * };
+ */
+/**
+ * @constructor
+ */
+let Navigator = function () {};
+
+
+/**
+ * Navigator implements NavigatorID;
+ */
+/**
+ * @implements {NavigatorID}
+ */
+Navigator.prototype = NavigatorID.prototype;
+
+
+/**
+ * Navigator implements NavigatorLanguage;
+ */
+/**
+ * @implements {NavigatorLanguage}
+ */
+Navigator.prototype = NavigatorLanguage.prototype;
+
+
+/**
+ * Navigator implements NavigatorOnLine;
+ */
+/**
+ * @implements {NavigatorOnLine}
+ */
+Navigator.prototype = NavigatorOnLine.prototype;
+
+
+/**
+ * Navigator implements NavigatorContentUtils;
+ */
+/**
+ * @implements {NavigatorContentUtils}
+ */
+Navigator.prototype = NavigatorContentUtils.prototype;
+
+
+/**
+ * Navigator implements NavigatorCookies;
+ */
+/**
+ * @implements {NavigatorCookies}
+ */
+Navigator.prototype = NavigatorCookies.prototype;
+
+
+/**
+ * Navigator implements NavigatorPlugins;
+ */
+/**
+ * @implements {NavigatorPlugins}
+ */
+Navigator.prototype = NavigatorPlugins.prototype;
+
+
+/**
+ * [NoInterfaceObject, Exposed=(Window, Worker)]
+ * interface NavigatorID {
+ *   [Exposed=Window] readonly attribute DOMString appCodeName; // constant "Mozilla"
+ *   readonly attribute DOMString appName; // constant "Netscape"
+ *   readonly attribute DOMString appVersion;
+ *   readonly attribute DOMString platform;
+ *   [Exposed=Window]readonly attribute DOMString product; // constant "Gecko"
+ *   readonly attribute DOMString userAgent;
+ * };
+ */
+/**
+ * @interface NavigatorID
+ */
+let NavigatorID = {};
+Window.prototype.NavigatorID = NavigatorID;
+Worker.prototype.NavigatorID = NavigatorID;
+
+/**
+ * @type {string}
+ * @readonly
+ */
+NavigatorID.prototype.appCodeName = "";
+Window.prototype.appCodeName = NavigatorID.prototype.appCodeName
+
+/**
+ * @type {string}
+ * @readonly
+ */
+NavigatorID.prototype.appName = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+NavigatorID.prototype.appVersion = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+NavigatorID.prototype.platform = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+NavigatorID.prototype.product = "";
+Window.prototype.product = NavigatorID.prototype.product
+
+/**
+ * @type {string}
+ * @readonly
+ */
+NavigatorID.prototype.userAgent = "";
+
+
+/**
+ * [NoInterfaceObject, Exposed=(Window, Worker)]
+ * interface NavigatorLanguage {
+ *   readonly attribute DOMString? language;
+ *   readonly attribute DOMString[] languages;
+ * };
+ */
+/**
+ * @interface NavigatorLanguage
+ */
+let NavigatorLanguage = {};
+Window.prototype.NavigatorLanguage = NavigatorLanguage;
+Worker.prototype.NavigatorLanguage = NavigatorLanguage;
+
+/**
+ * @type {?string}
+ * @readonly
+ */
+NavigatorLanguage.prototype.language = null;
+
+/**
+ * @type {DOMString[]}
+ * @readonly
+ */
+NavigatorLanguage.prototype.languages = [""];
+
+
+/**
+ * [NoInterfaceObject]
+ * interface NavigatorContentUtils {
+ *   // content handler registration
+ *   void registerProtocolHandler(DOMString scheme, DOMString url, DOMString title);
+ *   void unregisterProtocolHandler(DOMString scheme, DOMString url);
+ * };
+ */
+/**
+ * @interface NavigatorContentUtils
+ */
+let NavigatorContentUtils = {};
+
+/**
+ * @param {string} scheme
+ * @param {string} url
+ * @param {string} title
+ * @returns {void}
+ */
+NavigatorContentUtils.prototype.registerProtocolHandler = function (scheme, url, title) { return ; };
+
+/**
+ * @param {string} scheme
+ * @param {string} url
+ * @returns {void}
+ */
+NavigatorContentUtils.prototype.unregisterProtocolHandler = function (scheme, url) { return ; };
+
+
+/**
+ * [NoInterfaceObject]
+ * interface NavigatorCookies {
+ *   readonly attribute boolean cookieEnabled;
+ * };
+ */
+/**
+ * @interface NavigatorCookies
+ */
+let NavigatorCookies = {};
+
+/**
+ * @type {boolean}
+ * @readonly
+ */
+NavigatorCookies.prototype.cookieEnabled = false;
+
+
+/**
+ * [NoInterfaceObject]
+ *   interface NavigatorPlugins {
+ *   [SameObject] readonly attribute PluginArray plugins;
+ *   [SameObject] readonly attribute MimeTypeArray mimeTypes;
+ *   boolean javaEnabled();
+ * };
+ */
+/**
+ * @interface NavigatorPlugins
+ */
+let NavigatorPlugins = {};
+
+/**
+ * [SameObject] -- It will always return the same object
+ * @type {PluginArray}
+ * @readonly
+ */
+NavigatorPlugins.prototype.plugins = new PluginArray();
+
+/**
+ * [SameObject] -- It will always return the same object
+ * @type {MimeTypeArray}
+ * @readonly
+ */
+NavigatorPlugins.prototype.mimeTypes = new MimeTypeArray();
+
+/**
+ * @returns {boolean}
+ */
+NavigatorPlugins.prototype.javaEnabled = function () { return false; };
+
+
+/**
+ * interface PluginArray {
+ *   void refresh(optional boolean reload = false);
+ *   readonly attribute unsigned long length;
+ *   getter Plugin? item(unsigned long index);
+ *   getter Plugin? namedItem(DOMString name);
+ * };
+ */
+/**
+ * @constructor
+ */
+let PluginArray = function () {};
+
+/**
+ * @param {boolean} [reload=false]
+ * @returns {void}
+ */
+PluginArray.prototype.refresh = function (reload) { return ; };
+
+/**
+ * @type {number}
+ * @readonly
+ */
+PluginArray.prototype.length = 0;
+
+/**
+ * @getter
+ * @param {number} index
+ * @returns {?Plugin}
+ */
+PluginArray.prototype.item = function (index) { return null; };
+
+/**
+ * @getter
+ * @param {string} name
+ * @returns {?Plugin}
+ */
+PluginArray.prototype.namedItem = function (name) { return null; };
+
+
+/**
+ * interface MimeTypeArray {
+ *   readonly attribute unsigned long length;
+ *   getter MimeType? item(unsigned long index);
+ *   getter MimeType? namedItem(DOMString name);
+ * };
+ */
+/**
+ * @constructor
+ */
+let MimeTypeArray = function () {};
+
+/**
+ * @type {number}
+ * @readonly
+ */
+MimeTypeArray.prototype.length = 0;
+
+/**
+ * @getter
+ * @param {number} index
+ * @returns {?MimeType}
+ */
+MimeTypeArray.prototype.item = function (index) { return null; };
+
+/**
+ * @getter
+ * @param {string} name
+ * @returns {?MimeType}
+ */
+MimeTypeArray.prototype.namedItem = function (name) { return null; };
+
+
+/**
+ * interface Plugin {
+ *   readonly attribute DOMString name;
+ *   readonly attribute DOMString description;
+ *   readonly attribute DOMString filename;
+ *   readonly attribute unsigned long length;
+ *   getter MimeType? item(unsigned long index);
+ *   getter MimeType? namedItem(DOMString name);
+ * };
+ */
+/**
+ * @constructor
+ */
+let Plugin = function () {};
+
+/**
+ * @type {string}
+ * @readonly
+ */
+Plugin.prototype.name = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+Plugin.prototype.description = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+Plugin.prototype.filename = "";
+
+/**
+ * @type {number}
+ * @readonly
+ */
+Plugin.prototype.length = 0;
+
+/**
+ * @getter
+ * @param {number} index
+ * @returns {?MimeType}
+ */
+Plugin.prototype.item = function (index) { return null; };
+
+/**
+ * @getter
+ * @param {string} name
+ * @returns {?MimeType}
+ */
+Plugin.prototype.namedItem = function (name) { return null; };
+
+
+/**
+ * interface MimeType {
+ *   readonly attribute DOMString type;
+ *   readonly attribute DOMString description;
+ *   readonly attribute DOMString suffixes; // comma-separated
+ *   readonly attribute Plugin enabledPlugin;
+ * };
+ */
+/**
+ * @constructor
+ */
+let MimeType = function () {};
+
+/**
+ * @type {string}
+ * @readonly
+ */
+MimeType.prototype.type = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+MimeType.prototype.description = "";
+
+/**
+ * @type {string}
+ * @readonly
+ */
+MimeType.prototype.suffixes = "";
+
+/**
+ * @type {Plugin}
+ * @readonly
+ */
+MimeType.prototype.enabledPlugin = new Plugin();
+
+
+/**
+ * [Exposed=(Window, Worker)]
+ * interface ImageBitmap {
+ *   readonly attribute unsigned long width;
+ *   readonly attribute unsigned long height;
+ * };
+ */
+/**
+ * @constructor
+ */
+let ImageBitmap = function () {};
+Window.prototype.ImageBitmap = ImageBitmap;
+Worker.prototype.ImageBitmap = ImageBitmap;
+
+/**
+ * @type {number}
+ * @readonly
+ */
+ImageBitmap.prototype.width = 0;
+
+/**
+ * @type {number}
+ * @readonly
+ */
+ImageBitmap.prototype.height = 0;
+
+
+/**
+ * typedef (HTMLImageElement or
+ *         HTMLVideoElement or
+ *         HTMLCanvasElement or
+ *         Blob or
+ *         ImageData or
+ *         CanvasRenderingContext2D or
+ *         ImageBitmap) ImageBitmapSource;
+ */
+/**
+ * @typedef {(HTMLImageElement|HTMLVideoElement|HTMLCanvasElement|Blob|ImageData|CanvasRenderingContext2D|ImageBitmap)} ImageBitmapSource
+ */
+
+
+/**
+ * [NoInterfaceObject, Exposed=(Window, Worker)]
+ * interface ImageBitmapFactories {
+ *   Promise<ImageBitmap> createImageBitmap(ImageBitmapSource image);
+ *   Promise<ImageBitmap> createImageBitmap(ImageBitmapSource image, long sx, long sy, long sw, long sh);
+ * };
+ */
+/**
+ * @interface ImageBitmapFactories
+ */
+let ImageBitmapFactories = {};
+Window.prototype.ImageBitmapFactories = ImageBitmapFactories;
+Worker.prototype.ImageBitmapFactories = ImageBitmapFactories;
+
+/**
+ * @param {ImageBitmapSource} image
+ * @returns {Promise.<ImageBitmap>}
+ */
+ImageBitmapFactories.prototype.createImageBitmap = function (image) { return new ImageBitmap(); };
+
+/**
+ * @param {ImageBitmapSource} image
+ * @param {number} sx
+ * @param {number} sy
+ * @param {number} sw
+ * @param {number} sh
+ * @returns {Promise.<ImageBitmap>}
+ */
+ImageBitmapFactories.prototype.createImageBitmap = function (image, sx, sy, sw, sh) { return new ImageBitmap(); };
+
+
+/**
+ * Window implements ImageBitmapFactories;
+ */
+/**
+ * @implements {ImageBitmapFactories}
+ */
+Window.prototype = ImageBitmapFactories.prototype;
+
+
+/**
+ * WorkerGlobalScope implements ImageBitmapFactories;
+ */
+/**
+ * @implements {ImageBitmapFactories}
+ */
+WorkerGlobalScope.prototype = ImageBitmapFactories.prototype;
+
+
