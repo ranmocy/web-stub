@@ -49,7 +49,7 @@ To test: `node . all && if ! git diff-index --quiet HEAD; then exit 1; fi`
 ## Dependencies
 
 * [WebIDL2](https://github.com/w3c/webidl2.js)
-* [webidl-extract](https://github.com/AndreasMadsen/webidl-extract)
+* [webidl-scraper](https://github.com/motiz88/webidl-scraper)
 
 # Contribution
 

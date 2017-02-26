@@ -868,7 +868,7 @@ function updateIDL() {
   for (let url of Object.keys(URL_TO_IDL)) {
     let path = "idl/" + URL_TO_IDL[url];
     console.log('update', url, '=>', path);
-    exec(`curl ${url} | node_modules/webidl-extract/cli.js > ${path}`);
+    exec(`node node_modules/webidl-scraper/cli/index.js ${url} > ${path}`);
   }
 }
 
