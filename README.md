@@ -32,6 +32,7 @@ WebStorm:
 
 * [WebIDL2](https://github.com/w3c/webidl2.js)
 * [WebAppAPI]("https://www.w3.org/TR/html51/webappapis.html")
+* [WebComponent]("https://w3c.github.io/webcomponents/spec/custom/")
 * [IndexedDB](https://www.w3.org/TR/IndexedDB/)
 * [Fetch](https://fetch.spec.whatwg.org/)
 * ...Upcoming

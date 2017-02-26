@@ -395,6 +395,10 @@ function convertInterfaceOperation(interface_name, member) {
         doc_lines.push(`[NewObject]`);
         break;
       }
+      case 'CEReactions': {
+        doc_lines.push(`[CEReactions] -- Specify algorithms used in custom elements`);
+        break;
+      }
       default: {
         fail("Un-supported attr:" + attr.name, attr);
       }
@@ -857,16 +861,17 @@ function convertDir(source_root, target_root, ignore_error) {
 
 const exec = require( 'child_process' ).exec;
 const URL_TO_IDL = {
-  "https://www.w3.org/TR/IndexedDB/" : "IndexedDB.webidl",
-  "https://fetch.spec.whatwg.org/" : "Fetch.webidl",
-  "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI.webidl",
+  "https://www.w3.org/TR/IndexedDB/" : "IndexedDB",
+  "https://fetch.spec.whatwg.org/" : "Fetch",
+  "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI",
+  "https://w3c.github.io/webcomponents/spec/custom/" : "WebComponent",
 };
 /**
  * @returns {undefined}
  */
 function updateIDL() {
   for (let url of Object.keys(URL_TO_IDL)) {
-    let path = "idl/" + URL_TO_IDL[url];
+    let path = `idl/${URL_TO_IDL[url]}.webidl`;
     console.log('update', url, '=>', path);
     exec(`node node_modules/webidl-scraper/cli/index.js ${url} > ${path}`);
   }
