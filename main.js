@@ -185,7 +185,7 @@ function getTypePlainName(idlType) {
  */
 function getTypeInDoc(type) {
   if (typeof(type) === 'string') {
-    return type;
+    return getTypePlainName(type);
   }
 
   let doc = type.nullable ? "?" : "";
@@ -225,7 +225,7 @@ function getTypeInDoc(type) {
     assert(!type.sequence);
     assert(type.generic === null, type);
     assert(typeof(type.idlType) === 'string');
-    doc += getTypePlainName(type.idlType);
+    doc += getTypeInDoc(type.idlType);
   }
   return doc;
 }
@@ -318,6 +318,11 @@ function convertInterfaceAttribute(interface_name, member) {
         }
         break;
       }
+      case 'Unforgeable': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[Unforgeable] -- This method is non-configurable.`);
+        break;
+      }
       default: {
         fail("Un-supported attr:" + attr.name, attr);
       }
@@ -361,7 +366,7 @@ function getFunction(name, args, return_type) {
 
 /**
  * @param {string} name
- * @param {WebIDLType|WebIDLType[]} return_types
+ * @param {WebIDLSimpleType|WebIDLType|WebIDLType[]} return_types
  * @returns {string}
  */
 function getIterator(name, return_types) {
@@ -391,12 +396,19 @@ function convertInterfaceOperation(interface_name, member) {
   member.extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'NewObject': {
+        assert(attr.arguments === null);
         // By default we always create new object, no op here
-        doc_lines.push(`[NewObject]`);
+        doc_lines.push(`[NewObject] -- Always returns new object.`);
         break;
       }
       case 'CEReactions': {
-        doc_lines.push(`[CEReactions] -- Specify algorithms used in custom elements`);
+        assert(attr.arguments === null);
+        doc_lines.push(`[CEReactions] -- Specify algorithms used in custom elements.`);
+        break;
+      }
+      case 'Unscopable': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[Unscopable] -- Implementation won't include this property name with it as its base object.`);
         break;
       }
       default: {
@@ -455,8 +467,69 @@ function getAllIterators(interface_name, member) {
 
     return iterators;
   } else {
-    fail("Array iterator is not supported yet");
+    // Array iterators
+    let key_type = 'unsigned long';
+    let value_type = member.idlType;
+    let iterators = [];
+    iterators.push(
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type)])}}`]) + "\n" +
+      getIterator(`${interface_name}.prototype.keys`, key_type));
+    iterators.push(
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(value_type)])}}`]) + "\n" +
+      getIterator(`${interface_name}.prototype.values`, value_type));
+    iterators.push(
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type), getTypeInDoc(value_type)])}}`]) + "\n" +
+      getIterator(`${interface_name}.prototype.entries`, [key_type, value_type]));
+    iterators.push(
+      getDocFromLines([`@returns {${getGenericTypeInDoc("Iterator", [getTypeInDoc(key_type), getTypeInDoc(value_type)])}}`]) + "\n" +
+      getIterator(`${interface_name}.prototype[Symbol.iterator]`, [key_type, value_type]));
+
+    return iterators;
   }
+}
+
+/**
+ * @param {WebIDLConstValue} value
+ * @returns {string}
+ */
+function getInterfaceConstValue(value) {
+  switch (value.type) {
+    case "string":
+    case "number":
+    case "booleanean":
+      return value.value;
+    case "null":
+      return "null";
+    case "Infinity":
+      return `${value.negative ? '-' : ''}Infinity`;
+    case "NaN":
+      return "NaN";
+    case "sequence":
+      fail("Un-supported sequence const value type");
+      break;
+    default:
+      fail("Unknown const value type:" + value.type, value);
+  }
+}
+
+/**
+ * @param {string} interface_name
+ * @param {WebIDLConstantMember} member
+ * @return {string}
+ */
+function getInterfaceConst(interface_name, member) {
+  assert(member.type === 'const');
+  assert(!member.nullable);
+  assert(member.extAttrs.length === 0);
+
+  let doc_lines = [];
+  doc_lines.push(`@type {${getTypeInDoc(member.idlType)}}`);
+  let result = [getDocFromLines(doc_lines)];
+
+  debugger
+  result.push(`${interface_name}.${member.name} = ${getInterfaceConstValue(member.value)}`);
+
+  return result.join("\n");
 }
 
 /**
@@ -563,6 +636,10 @@ function convertInterface(definition) {
       }
       case 'iterable': {
         result = result.concat(getAllIterators(definition.name, member));
+        break;
+      }
+      case 'const': {
+        result = result.concat(getInterfaceConst(definition.name, member));
         break;
       }
       default:
@@ -752,7 +829,6 @@ function slicer(source_str) {
     }
     index++;
   }
-  debugger;
   assert(source_str.length === 0, source_str);
   return result;
 }
@@ -785,6 +861,7 @@ function convertFile(source_path, target_path) {
     let doc = getDocFromLines(idl_str.split("\n"));
     let str;
     switch (definition.type) {
+      case 'callback interface':
       case 'interface': {
         str = convertInterface(definition);
         break;
@@ -861,6 +938,7 @@ function convertDir(source_root, target_root, ignore_error) {
 
 const exec = require( 'child_process' ).exec;
 const URL_TO_IDL = {
+  "https://dom.spec.whatwg.org/" : "DOMStandard",
   "https://www.w3.org/TR/IndexedDB/" : "IndexedDB",
   "https://fetch.spec.whatwg.org/" : "Fetch",
   "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI",
