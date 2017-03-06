@@ -1,14 +1,14 @@
 "use strict";
 
 const RESET = "\x1b[0m";
-const BLACK = "\x1b[30m";
-const RED = "\x1b[31m";
-const GREEN = "\x1b[32m";
+// const BLACK = "\x1b[30m";
+// const RED = "\x1b[31m";
+// const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
-const BLUE = "\x1b[34m";
+// const BLUE = "\x1b[34m";
 const MAGENTA = "\x1b[35m";
 const CYAN = "\x1b[36m";
-const WHITE = "\x1b[37m";
+// const WHITE = "\x1b[37m";
 
 
 /** @type {WebIDL2} */
@@ -261,12 +261,17 @@ function getArgInDoc(arg) {
   doc.push(`@param {${type_doc}} `);
   doc.push(arg_name);
   if (arg.extAttrs.length > 0) {
-    doc.push(' -- ');
+    doc.push(' --');
     arg.extAttrs.forEach(attr => {
       assert(attr.arguments === null);
       switch (attr.name) {
         case 'EnforceRange': {
-          doc.push(attr.name);
+          doc.push(` [EnforceRange]`);
+          break;
+        }
+        case 'TreatNullAs': {
+          assert(attr.rhs.type === 'identifier');
+          doc.push(` [TreatNullAs=${attr.rhs.value}]`);
           break;
         }
         default: {
@@ -328,6 +333,24 @@ function convertInterfaceAttribute(interface_name, member) {
         doc_lines.push(`[CEReactions] -- Specify algorithms used in custom elements.`);
         break;
       }
+      case 'PutForwards': {
+        assert(attr.arguments === null);
+        assert(attr.rhs.type === 'identifier');
+        assert(member.readonly);
+        doc_lines.push(`[PutForwards=${attr.rhs.value}] -- The value assigned to this attribute will be forwarded to its property "${attr.rhs.value}".`);
+        break;
+      }
+      case 'Unscopable': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[Unscopable] -- Implementation won't include this property name with it as its base object.`);
+        break;
+      }
+      case 'TreatNullAs': {
+        assert(attr.arguments === null);
+        assert(attr.rhs.type === 'identifier');
+        doc_lines.push(`[TreatNullAs=${attr.rhs.value}]`);
+        break;
+      }
       default: {
         fail("Un-supported attr:" + attr.name, attr);
       }
@@ -353,7 +376,7 @@ function convertInterfaceAttribute(interface_name, member) {
 /**
  * @param {string} name
  * @param {WebIDLArgument[]} args
- * @param {?WebIDLType} return_type
+ * @param {?(WebIDLSimpleType | WebIDLType)} return_type
  * @returns {string} -- "<name> = function (arg1, arg2) { return default_value; };"
  */
 function getFunction(name, args, return_type) {
@@ -386,11 +409,34 @@ function getIterator(name, return_types) {
  * @param {WebIDLOperationMember} member
  * @returns {string}
  */
-function convertInterfaceOperation(interface_name, member) {
+function getInterfaceStringifier(interface_name, member) {
+  assert(!member.getter);
+  assert(!member.setter);
   assert(!member.creator);
   assert(!member.deleter);
   assert(!member.legacycaller);
-  assert(!member.stringifier);
+  assert(!member.static);
+  assert(member.stringifier);
+  assert(member.extAttrs.length === 0);
+
+  let doc_lines = [`@returns {string}`];
+  let result = [getDocFromLines(doc_lines)];
+  result.push(getFunction(`${interface_name}.prototype.toString`, [], 'DOMString'));
+  return result.join("\n");
+}
+
+/**
+ * @param {string} interface_name
+ * @param {WebIDLOperationMember} member
+ * @returns {string}
+ */
+function convertInterfaceOperation(interface_name, member) {
+  if (member.stringifier) {
+    return getInterfaceStringifier(interface_name, member);
+  }
+  assert(!member.creator);
+  assert(!member.deleter);
+  assert(!member.legacycaller);
   if (interface_name === null) {
     assert(!member.static);
   }
@@ -531,7 +577,6 @@ function getInterfaceConst(interface_name, member) {
   doc_lines.push(`@type {${getTypeInDoc(member.idlType)}}`);
   let result = [getDocFromLines(doc_lines)];
 
-  debugger
   result.push(`${interface_name}.${member.name} = ${getInterfaceConstValue(member.value)}`);
 
   return result.join("\n");
