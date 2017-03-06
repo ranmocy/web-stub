@@ -323,6 +323,11 @@ function convertInterfaceAttribute(interface_name, member) {
         doc_lines.push(`[Unforgeable] -- This method is non-configurable.`);
         break;
       }
+      case 'CEReactions': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[CEReactions] -- Specify algorithms used in custom elements.`);
+        break;
+      }
       default: {
         fail("Un-supported attr:" + attr.name, attr);
       }
@@ -533,37 +538,52 @@ function getInterfaceConst(interface_name, member) {
 }
 
 /**
- * @typedef {{no_interface_object: boolean, constructor_arguments: WebIDLArgument[], exposed: string[]}} WebIDLInterfaceConfig
+ * @typedef {Object} WebIDLInterfaceConfig
+ * @property {boolean} no_interface_object
+ * @property {WebIDLArgument[]} constructor_arguments
+ * @property {string[]} exposed
+ * @property {boolean} LegacyUnenumerableNamedProperties
  */
 /**
  * @param {WebIDLExtendedAttribute[]} extAttrs
  * @returns {WebIDLInterfaceConfig}
  */
 function getInterfaceConfig(extAttrs) {
-  let no_interface_object = false;
-  let constructor_arguments = [];
-  let exposed = [];
+  let config = {
+    no_interface_object: false,
+    constructor_arguments: [],
+    exposed: [],
+    LegacyUnenumerableNamedProperties: false,
+  };
 
   extAttrs.forEach(attr => {
     switch (attr.name) {
       case 'NoInterfaceObject': {
-        no_interface_object = true;
+        config.no_interface_object = true;
         break;
       }
       case 'Constructor': {
-        constructor_arguments = attr.arguments;
+        if (attr.arguments === null) {
+          attr.arguments = [];
+        }
+        config.constructor_arguments = attr.arguments;
         break;
       }
       case 'Exposed': {
         assert(attr.arguments === null);
         if (attr.rhs.type === 'identifier') {
           assert(typeof(attr.rhs.value) === 'string');
-          exposed = [attr.rhs.value];
+          config.exposed = [attr.rhs.value];
         } else if (attr.rhs.type === 'identifier-list') {
-          exposed = attr.rhs.value;
+          config.exposed = attr.rhs.value;
         } else {
           fail("Unknown Exposed attr", attr);
         }
+        break;
+      }
+      case 'LegacyUnenumerableNamedProperties': {
+        assert(attr.arguments === null);
+        config.LegacyUnenumerableNamedProperties = true;
         break;
       }
       default: {
@@ -572,11 +592,7 @@ function getInterfaceConfig(extAttrs) {
     }
   });
 
-  return {
-    no_interface_object: no_interface_object,
-    constructor_arguments: constructor_arguments,
-    exposed: exposed,
-  };
+  return config;
 }
 
 /**
@@ -591,6 +607,10 @@ function getInterfaceConstructorAndInheritance(definition) {
   let config = getInterfaceConfig(definition.extAttrs);
   let doc_lines = [];
   let result = [];
+
+  if (config.LegacyUnenumerableNamedProperties) {
+    doc_lines.push(`[LegacyUnenumerableNamedProperties]`);
+  }
 
   if (config.no_interface_object) {
     assert(config.constructor_arguments.length === 0);
