@@ -2649,3 +2649,105 @@ NodeFilter.SHOW_NOTATION = 2048
 NodeFilter.prototype.acceptNode = function (node) { return 0; };
 
 
+/**
+ * interface DOMTokenList {
+ *   readonly attribute unsigned long length;
+ *   getter DOMString? item(unsigned long index);
+ *   boolean contains(DOMString token);
+ *   [CEReactions] void add(DOMString... tokens);
+ *   [CEReactions] void remove(DOMString... tokens);
+ *   [CEReactions] boolean toggle(DOMString token, optional boolean force);
+ *   [CEReactions] void replace(DOMString token, DOMString newToken);
+ *   boolean supports(DOMString token);
+ *   [CEReactions] stringifier attribute DOMString value;
+ *   iterable<DOMString>;
+ * };
+ */
+/**
+ * @constructor
+ */
+let DOMTokenList = function () {};
+
+/**
+ * @type {number}
+ * @readonly
+ */
+DOMTokenList.prototype.length = 0;
+
+/**
+ * @getter
+ * @param {number} index
+ * @returns {?string}
+ */
+DOMTokenList.prototype.item = function (index) { return null; };
+
+/**
+ * @param {string} token
+ * @returns {boolean}
+ */
+DOMTokenList.prototype.contains = function (token) { return false; };
+
+/**
+ * [CEReactions] -- Specify algorithms used in custom elements.
+ * @param {...string} tokens
+ * @returns {void}
+ */
+DOMTokenList.prototype.add = function (tokens) { return ; };
+
+/**
+ * [CEReactions] -- Specify algorithms used in custom elements.
+ * @param {...string} tokens
+ * @returns {void}
+ */
+DOMTokenList.prototype.remove = function (tokens) { return ; };
+
+/**
+ * [CEReactions] -- Specify algorithms used in custom elements.
+ * @param {string} token
+ * @param {boolean} [force]
+ * @returns {boolean}
+ */
+DOMTokenList.prototype.toggle = function (token, force) { return false; };
+
+/**
+ * [CEReactions] -- Specify algorithms used in custom elements.
+ * @param {string} token
+ * @param {string} newToken
+ * @returns {void}
+ */
+DOMTokenList.prototype.replace = function (token, newToken) { return ; };
+
+/**
+ * @param {string} token
+ * @returns {boolean}
+ */
+DOMTokenList.prototype.supports = function (token) { return false; };
+
+/**
+ * [stringifier]
+ * [CEReactions] -- Specify algorithms used in custom elements.
+ * @type {string}
+ */
+DOMTokenList.prototype.value = "";
+
+/**
+ * @returns {Iterator.<number>}
+ */
+DOMTokenList.prototype.keys = function* () { yield 0; };
+
+/**
+ * @returns {Iterator.<string>}
+ */
+DOMTokenList.prototype.values = function* () { yield ""; };
+
+/**
+ * @returns {Iterator.<number, string>}
+ */
+DOMTokenList.prototype.entries = function* () { yield [0, ""]; };
+
+/**
+ * @returns {Iterator.<number, string>}
+ */
+DOMTokenList.prototype[Symbol.iterator] = function* () { yield [0, ""]; };
+
+

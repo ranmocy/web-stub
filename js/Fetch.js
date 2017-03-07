@@ -119,31 +119,31 @@ Body.prototype.body = null;
 Body.prototype.bodyUsed = false;
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Promise.<ArrayBuffer>}
  */
 Body.prototype.arrayBuffer = function () { return new ArrayBuffer(); };
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Promise.<Blob>}
  */
 Body.prototype.blob = function () { return new Blob(); };
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Promise.<FormData>}
  */
 Body.prototype.formData = function () { return new FormData(); };
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Promise.<*>}
  */
 Body.prototype.json = function () { return {}; };
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Promise.<USVString>}
  */
 Body.prototype.text = function () { return new USVString(); };
@@ -266,7 +266,7 @@ Request.prototype.integrity = "";
 Request.prototype.keepalive = false;
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Request}
  */
 Request.prototype.clone = function () { return new Request(); };
@@ -388,13 +388,13 @@ Window.prototype.Response = Response;
 Worker.prototype.Response = Response;
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Response}
  */
 Response.error = function () { return new Response(); };
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @param {USVString} url
  * @param {number} [status=302]
  * @returns {Response}
@@ -452,7 +452,7 @@ Response.prototype.headers = new Headers();
 Response.prototype.trailer = new Headers();
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @returns {Response}
  */
 Response.prototype.clone = function () { return new Response(); };
@@ -498,7 +498,7 @@ Response.prototype = Body.prototype;
 
 
 /**
- * [NewObject]
+ * [NewObject] -- Always returns new object.
  * @param {RequestInfo} input
  * @param {RequestInit} [init]
  * @returns {Promise.<Response>}

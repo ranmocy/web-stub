@@ -956,7 +956,7 @@ Worker.prototype.NavigatorLanguage = NavigatorLanguage;
 NavigatorLanguage.prototype.language = null;
 
 /**
- * @type {DOMString[]}
+ * @type {string[]}
  * @readonly
  */
 NavigatorLanguage.prototype.languages = [""];

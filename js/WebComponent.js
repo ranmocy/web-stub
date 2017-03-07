@@ -11,7 +11,7 @@
 let CustomElementRegistry = function () {};
 
 /**
- * [CEReactions] -- Specify algorithms used in custom elements
+ * [CEReactions] -- Specify algorithms used in custom elements.
  * @param {string} name
  * @param {Function} constructor
  * @param {ElementDefinitionOptions} [options]

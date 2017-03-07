@@ -291,13 +291,16 @@ function getArgInDoc(arg) {
  */
 function convertInterfaceAttribute(interface_name, member) {
   assert(!member.static);
-  assert(!member.stringifier);
   assert(!member.inherit);
   assert(isDefined(interface_name));
 
   let result = [];
   let doc_lines = [];
   let exposed = [];
+
+  if (member.stringifier) {
+    doc_lines.push(`[stringifier]`);
+  }
 
   member.extAttrs.forEach(attr => {
     switch (attr.name) {
@@ -418,6 +421,7 @@ function getInterfaceStringifier(interface_name, member) {
   assert(!member.static);
   assert(member.stringifier);
   assert(member.extAttrs.length === 0);
+  assert(!isDefined(member.name), member);
 
   let doc_lines = [`@returns {string}`];
   let result = [getDocFromLines(doc_lines)];

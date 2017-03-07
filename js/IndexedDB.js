@@ -303,7 +303,7 @@ let IDBFactory = function () {};
 
 /**
  * @param {string} name
- * @param {number} [version] -- EnforceRange
+ * @param {number} [version] -- [EnforceRange]
  * @returns {IDBOpenDBRequest}
  */
 IDBFactory.prototype.open = function (name, version) { return new IDBOpenDBRequest(); };
@@ -650,7 +650,7 @@ IDBCursor.prototype.primaryKey = {};
 IDBCursor.prototype.update = function (value) { return new IDBRequest(); };
 
 /**
- * @param {number} count -- EnforceRange
+ * @param {number} count -- [EnforceRange]
  * @returns {void}
  */
 IDBCursor.prototype.advance = function (count) { return ; };
