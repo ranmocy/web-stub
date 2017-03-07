@@ -1008,10 +1008,10 @@ function convertDir(source_root, target_root, ignore_error) {
 const exec = require( 'child_process' ).exec;
 const URL_TO_IDL = {
   "https://dom.spec.whatwg.org/" : "DOMStandard",
-  "https://www.w3.org/TR/IndexedDB/" : "IndexedDB",
-  "https://fetch.spec.whatwg.org/" : "Fetch",
   "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI",
   "https://w3c.github.io/webcomponents/spec/custom/" : "WebComponent",
+  "https://www.w3.org/TR/IndexedDB/" : "IndexedDB",
+  "https://fetch.spec.whatwg.org/" : "Fetch",
 };
 /**
  * @returns {undefined}
