@@ -21,8 +21,9 @@ Params validation
 
 # Usage
 
-Clone this library to local `git clone https://github.com/ranmocy/web-stub.git`.
+Download this package by `npm install web-stub` or `git clone https://github.com/ranmocy/web-stub.git`.
 Setup your IDE to add `web-stub/js` folder or any JS file under it to be a library.
+
 Note: Do not include this folder to your production code. This is for IDE only.
 
 WebStorm:
