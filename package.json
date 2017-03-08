@@ -1,6 +1,6 @@
 {
   "name": "web-stub",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Generate placeholder for IDE from WebIDL",
   "main": "main.js",
   "scripts": {
@@ -24,11 +24,9 @@
     "url": "https://github.com/ranmocy/web-stub/issues"
   },
   "homepage": "https://github.com/ranmocy/web-stub#readme",
-  "dependencies": {
-    "process": "latest"
-  },
   "devDependencies": {
-    "webidl2": "2.2.2",
-    "webidl-scraper": "0.0.4"
+    "process": "latest",
+    "webidl-scraper": "0.0.4",
+    "webidl2": "2.2.2"
   }
 }
