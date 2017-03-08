@@ -905,9 +905,10 @@ function slicer(source_str) {
 /**
  * @param {string} source_path
  * @param {string} target_path
+ * @param {string} is_debug
  * @return {undefined}
  */
-function convertFile(source_path, target_path) {
+function convertFile(source_path, target_path, is_debug) {
   assert(source_path.endsWith(".webidl"));
   assert(target_path.endsWith(".js"));
 
@@ -916,9 +917,11 @@ function convertFile(source_path, target_path) {
   fs.writeFileSync(target_path, "", {flag: 'w'});
 
   idl_list.forEach((idl_str) => {
-    console.log(">>>>>>>>>>>>>>>>>>");
-    console.log(idl_str);
-    console.log("==================");
+    if (isDefined(is_debug)) {
+      console.log(">>>>>>>>>>>>>>>>>>");
+      console.log(idl_str);
+      console.log("==================");
+    }
 
     let definitions = WebIDL2.parse(idl_str);
     if (definitions.length === 0) {
@@ -960,8 +963,12 @@ function convertFile(source_path, target_path) {
       }
     }
     let definition_result = doc + "\n" + str + "\n";
-    console.log(definition_result);
-    console.log("<<<<<<<<<<<<<<<<<<");
+
+    if (isDefined(is_debug)) {
+      console.log(definition_result);
+      console.log("<<<<<<<<<<<<<<<<<<");
+    }
+
     if (definition_result.match(/\[object Object]/)) {
       fail("definition_result contains [object Object]!");
     }
@@ -972,10 +979,10 @@ function convertFile(source_path, target_path) {
 /**
  * @param {string} source_root
  * @param {string} target_root
- * @param {string} [ignore_error]
+ * @param {string} [is_debug]
  * @return {undefined}
  */
-function convertDir(source_root, target_root, ignore_error) {
+function convertDir(source_root, target_root, is_debug) {
   assert(fs.lstatSync(source_root).isDirectory());
   if (!fs.existsSync(target_root)) {
     fs.mkdirSync(target_root, 0o766);
@@ -991,14 +998,14 @@ function convertDir(source_root, target_root, ignore_error) {
       try {
         convertFile(source, target.replace(".webidl", ".js"));
       } catch (e) {
-        if (isDefined(ignore_error)) {
+        if (isDefined(is_debug)) {
           console.log("Exception in convertFile:", e, e.stack);
         } else {
           throw e;
         }
       }
     } else if (source_stat.isDirectory()) {
-      convertDir(source, target, ignore_error);
+      convertDir(source, target, is_debug);
     } else {
       fail("Un-supported file:" + source, source_stat);
     }
@@ -1034,11 +1041,11 @@ switch (cmd) {
     break;
   }
   case 'all': {
-    convertDir('idl', 'js', 'ignore_error');
+    convertDir('idl', 'js');
     break;
   }
   default:
-    convertDir('idl', 'js');
+    convertDir('idl', 'js', 'debug');
 }
 
 // =============== Test ==============

@@ -4,7 +4,7 @@
   "description": "Generate placeholder for IDE from WebIDL",
   "main": "main.js",
   "scripts": {
-    "test": "node . all && if ! git diff-index --quiet HEAD; then exit 1; fi"
+    "test": "node . all && [[ $(git diff HEAD 2>/dev/null) ]] && exit 1"
   },
   "repository": {
     "type": "git",
