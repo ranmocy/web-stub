@@ -25,7 +25,7 @@ interface Event {
   [Unforgeable] readonly attribute boolean isTrusted;
   readonly attribute DOMTimeStamp timeStamp;
 
-  void initEvent(DOMString type, boolean bubbles, boolean cancelable); // historical
+  void initEvent(DOMString type, optional boolean bubbles = false, optional boolean cancelable = false); // historical
 };
 
 dictionary EventInit {
@@ -40,7 +40,7 @@ dictionary EventInit {
 interface CustomEvent : Event {
   readonly attribute any detail;
 
-  void initCustomEvent(DOMString type, boolean bubbles, boolean cancelable, any detail);
+  void initCustomEvent(DOMString type, optional boolean bubbles = false, optional boolean cancelable = false, optional any detail = null);
 };
 
 dictionary CustomEventInit : EventInit {
@@ -342,7 +342,7 @@ interface Element : Node {
 
   [CEReactions] attribute DOMString id;
   [CEReactions] attribute DOMString className;
-  [CEReactions, SameObject, PutForwards=value] readonly attribute DOMTokenList classList;
+  [SameObject, PutForwards=value] readonly attribute DOMTokenList classList;
   [CEReactions, Unscopable] attribute DOMString slot;
 
   boolean hasAttributes();

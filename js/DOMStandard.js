@@ -21,7 +21,7 @@
  *   readonly attribute boolean composed;
  *   [Unforgeable] readonly attribute boolean isTrusted;
  *   readonly attribute DOMTimeStamp timeStamp;
- *   void initEvent(DOMString type, boolean bubbles, boolean cancelable); // historical
+ *   void initEvent(DOMString type, optional boolean bubbles = false, optional boolean cancelable = false); // historical
  * };
  */
 /**
@@ -141,8 +141,8 @@ Event.prototype.timeStamp = new DOMTimeStamp();
 
 /**
  * @param {string} type
- * @param {boolean} bubbles
- * @param {boolean} cancelable
+ * @param {boolean} [bubbles=false]
+ * @param {boolean} [cancelable=false]
  * @returns {void}
  */
 Event.prototype.initEvent = function (type, bubbles, cancelable) { return ; };
@@ -168,7 +168,7 @@ Event.prototype.initEvent = function (type, bubbles, cancelable) { return ; };
  *  Exposed=(Window,Worker)]
  * interface CustomEvent : Event {
  *   readonly attribute any detail;
- *   void initCustomEvent(DOMString type, boolean bubbles, boolean cancelable, any detail);
+ *   void initCustomEvent(DOMString type, optional boolean bubbles = false, optional boolean cancelable = false, optional any detail = null);
  * };
  */
 /**
@@ -189,9 +189,9 @@ CustomEvent.prototype.detail = {};
 
 /**
  * @param {string} type
- * @param {boolean} bubbles
- * @param {boolean} cancelable
- * @param {*} detail
+ * @param {boolean} [bubbles=false]
+ * @param {boolean} [cancelable=false]
+ * @param {*} [detail=null]
  * @returns {void}
  */
 CustomEvent.prototype.initCustomEvent = function (type, bubbles, cancelable, detail) { return ; };
@@ -1593,7 +1593,7 @@ ShadowRoot.prototype.host = new Element();
  *   readonly attribute DOMString tagName;
  *   [CEReactions] attribute DOMString id;
  *   [CEReactions] attribute DOMString className;
- *   [CEReactions, SameObject, PutForwards=value] readonly attribute DOMTokenList classList;
+ *   [SameObject, PutForwards=value] readonly attribute DOMTokenList classList;
  *   [CEReactions, Unscopable] attribute DOMString slot;
  *   boolean hasAttributes();
  *   [SameObject] readonly attribute NamedNodeMap attributes;
@@ -1667,7 +1667,6 @@ Element.prototype.id = "";
 Element.prototype.className = "";
 
 /**
- * [CEReactions] -- Specify algorithms used in custom elements.
  * [SameObject] -- It will always return the same object
  * [PutForwards=value] -- The value assigned to this attribute will be forwarded to its property "value".
  * @type {DOMTokenList}

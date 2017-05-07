@@ -63,7 +63,7 @@ dictionary RequestInit {
 };
 
 enum RequestType { "", "audio", "font", "image", "script", "style", "track", "video" };
-enum RequestDestination { "", "document", "embed", "font", "image", "manifest", "media", "object", "report", "script", "serviceworker", "sharedworker", "style",  "worker", "xslt" };
+enum RequestDestination { "", "audio", "document", "embed", "font", "image", "manifest", "object", "report", "script", "serviceworker", "sharedworker", "style",  "track", "video", "worker", "xslt" };
 enum RequestMode { "navigate", "same-origin", "no-cors", "cors" };
 enum RequestCredentials { "omit", "same-origin", "include" };
 enum RequestCache { "default", "no-store", "reload", "no-cache", "force-cache", "only-if-cached" };
@@ -82,7 +82,7 @@ interface Response {
   readonly attribute boolean ok;
   readonly attribute ByteString statusText;
   [SameObject] readonly attribute Headers headers;
-  [SameObject] readonly attribute Promise<Headers> trailer;
+  readonly attribute Promise<Headers> trailer;
 
   [NewObject] Response clone();
 };

@@ -323,10 +323,10 @@ Request.prototype = Body.prototype;
 
 
 /**
- * enum RequestDestination { "", "document", "embed", "font", "image", "manifest", "media", "object", "report", "script", "serviceworker", "sharedworker", "style",  "worker", "xslt" };
+ * enum RequestDestination { "", "audio", "document", "embed", "font", "image", "manifest", "object", "report", "script", "serviceworker", "sharedworker", "style",  "track", "video", "worker", "xslt" };
  */
 /**
- * @typedef {""|"document"|"embed"|"font"|"image"|"manifest"|"media"|"object"|"report"|"script"|"serviceworker"|"sharedworker"|"style"|"worker"|"xslt"} RequestDestination
+ * @typedef {""|"audio"|"document"|"embed"|"font"|"image"|"manifest"|"object"|"report"|"script"|"serviceworker"|"sharedworker"|"style"|"track"|"video"|"worker"|"xslt"} RequestDestination
  */
 
 
@@ -374,7 +374,7 @@ Request.prototype = Body.prototype;
  *   readonly attribute boolean ok;
  *   readonly attribute ByteString statusText;
  *   [SameObject] readonly attribute Headers headers;
- *   [SameObject] readonly attribute Promise<Headers> trailer;
+ *   readonly attribute Promise<Headers> trailer;
  *   [NewObject] Response clone();
  * };
  */
@@ -445,7 +445,6 @@ Response.prototype.statusText = new ByteString();
 Response.prototype.headers = new Headers();
 
 /**
- * [SameObject] -- It will always return the same object
  * @type {Promise.<Headers>}
  * @readonly
  */
