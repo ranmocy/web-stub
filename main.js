@@ -354,6 +354,11 @@ function convertInterfaceAttribute(interface_name, member) {
         doc_lines.push(`[TreatNullAs=${attr.rhs.value}]`);
         break;
       }
+      case 'Replaceable': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[Replaceable] -- This readonly value is a property of prototype. But assign to it can create this object's own property.`);
+        break;
+      }
       default: {
         fail("Un-supported attr:" + attr.name, attr);
       }
@@ -1013,7 +1018,7 @@ function convertDir(source_root, target_root, is_debug) {
       try {
         convertFile(source, target.replace(".webidl", ".js"));
       } catch (e) {
-        if (isDefined(is_debug)) {
+        if (!isDefined(is_debug)) {
           console.log("Exception in convertFile:", e, e.stack);
         } else {
           throw e;
@@ -1034,6 +1039,7 @@ const URL_TO_IDL = {
   "https://w3c.github.io/webcomponents/spec/custom/" : "WebComponent",
   "https://www.w3.org/TR/IndexedDB/" : "IndexedDB",
   "https://fetch.spec.whatwg.org/" : "Fetch",
+  "https://www.w3.org/TR/hr-time/" : "HighResolutionTime",
 };
 /**
  * @returns {undefined}
