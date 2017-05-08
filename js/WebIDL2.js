@@ -130,6 +130,23 @@ WebIDL2.prototype.parse = function (idl_string) { return [new WebIDLDefinition()
 
 
 /**
+ * dictionary WebIDLSerializerMember {
+ *   DOMString type = "serializer";
+ *   boolean patternMap = true;
+ *   sequence<DOMString> names;
+ *   sequence<WebIDLExtendedAttribute> extAttrs;
+ * };
+ */
+/**
+ * @typedef {Object} WebIDLSerializerMember
+ * @property {string} [type='serializer']
+ * @property {boolean} [patternMap=true]
+ * @property {string[]} [names]
+ * @property {WebIDLExtendedAttribute[]} [extAttrs]
+ */
+
+
+/**
  * dictionary WebIDLOperationMember {
  *   DOMString type = "operation";
  *   boolean getter = false;

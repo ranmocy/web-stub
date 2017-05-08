@@ -47,7 +47,12 @@ dictionary WebIDLConstantMember {
   sequence<WebIDLExtendedAttribute> extAttrs;
 };
 
-// TODO: dictionary WebIDLSerializerMember {};
+dictionary WebIDLSerializerMember {
+  DOMString type = "serializer";
+  boolean patternMap = true;
+  sequence<DOMString> names;
+  sequence<WebIDLExtendedAttribute> extAttrs;
+};
 
 dictionary WebIDLOperationMember {
   DOMString type = "operation";

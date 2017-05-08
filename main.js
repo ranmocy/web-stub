@@ -587,6 +587,17 @@ function getInterfaceConst(interface_name, member) {
 }
 
 /**
+ * @param {string} interface_name
+ * @param {WebIDLSerializerMember} member
+ * @return {string}
+ */
+function getSerializer(interface_name, member) {
+  let doc_lines = [`@return {string}`];
+  let func = getFunction(`${interface_name}.prototype.toString`, [], 'DOMString');
+  return [getDocFromLines(doc_lines), func].join("\n");
+}
+
+/**
  * @typedef {Object} WebIDLInterfaceConfig
  * @property {boolean} no_interface_object
  * @property {WebIDLArgument[]} constructor_arguments
@@ -709,6 +720,10 @@ function convertInterface(definition) {
       }
       case 'const': {
         result = result.concat(getInterfaceConst(definition.name, member));
+        break;
+      }
+      case 'serializer': {
+        result = result.concat(getSerializer(definition.name, member));
         break;
       }
       default:

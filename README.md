@@ -47,6 +47,8 @@ To get WebIDL: `node . update`
 
 To generate JS files from WebIDL: `node .`
 
+To continuesly generate files: `rvm 2.3 do rerun -p 'idl/*|main.js' -x -- node .`
+
 To test: `node . all && if ! git diff-index --quiet HEAD; then exit 1; fi`
 
 ## Dependencies
