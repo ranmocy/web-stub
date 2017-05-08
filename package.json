@@ -1,6 +1,6 @@
 {
   "name": "web-stub",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Generate placeholder for IDE from WebIDL",
   "main": "main.js",
   "scripts": {
