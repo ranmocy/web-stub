@@ -556,7 +556,7 @@ function getInterfaceConstValue(value) {
   switch (value.type) {
     case "string":
     case "number":
-    case "booleanean":
+    case "boolean":
       return value.value;
     case "null":
       return "null";
@@ -1016,7 +1016,7 @@ function convertDir(source_root, target_root, is_debug) {
     let source_stat = fs.lstatSync(source);
     if (source_stat.isFile()) {
       try {
-        convertFile(source, target.replace(".webidl", ".js"));
+        convertFile(source, target.replace(".webidl", ".js"), is_debug);
       } catch (e) {
         if (!isDefined(is_debug)) {
           console.log("Exception in convertFile:", e, e.stack);
@@ -1033,6 +1033,7 @@ function convertDir(source_root, target_root, is_debug) {
 }
 
 const exec = require( 'child_process' ).exec;
+//noinspection SpellCheckingInspection
 const URL_TO_IDL = {
   "https://dom.spec.whatwg.org/" : "DOMStandard",
   "https://www.w3.org/TR/html51/webappapis.html" : "WebAppAPI",
