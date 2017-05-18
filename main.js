@@ -607,7 +607,7 @@ function getSerializer(interface_name, member) {
  * @property {boolean} no_interface_object
  * @property {WebIDLArgument[]} constructor_arguments
  * @property {string[]} exposed
- * @property {boolean} LegacyUnenumerableNamedProperties
+ * @property {string[]} attr_doc_lines
  */
 /**
  * @param {WebIDLExtendedAttribute[]} extAttrs
@@ -618,7 +618,7 @@ function getInterfaceConfig(extAttrs) {
     no_interface_object: false,
     constructor_arguments: [],
     exposed: [],
-    LegacyUnenumerableNamedProperties: false,
+    attr_doc_lines: [],
   };
 
   extAttrs.forEach(attr => {
@@ -648,7 +648,16 @@ function getInterfaceConfig(extAttrs) {
       }
       case 'LegacyUnenumerableNamedProperties': {
         assert(attr.arguments === null);
-        config.LegacyUnenumerableNamedProperties = true;
+        config.attr_doc_lines.push(`[LegacyUnenumerableNamedProperties]`);
+        break;
+      }
+      case 'Global': {
+        assert(attr.arguments === null);
+        config.attr_doc_lines.push(
+          "[Global] it indicates that objects implementing this interface can be used as the global object " +
+          "in an ECMAScript environment, and that the structure of the prototype chain and " +
+          "how properties corresponding to interface members will be reflected on the prototype objects " +
+          "will be different from other interfaces.");
         break;
       }
       default: {
@@ -673,8 +682,8 @@ function getInterfaceConstructorAndInheritance(definition) {
   let doc_lines = [];
   let result = [];
 
-  if (config.LegacyUnenumerableNamedProperties) {
-    doc_lines.push(`[LegacyUnenumerableNamedProperties]`);
+  if (config.attr_doc_lines) {
+    doc_lines = doc_lines.concat(config.attr_doc_lines);
   }
 
   if (config.no_interface_object) {
@@ -1041,6 +1050,7 @@ const URL_TO_IDL = {
   "https://www.w3.org/TR/IndexedDB/" : "IndexedDB",
   "https://fetch.spec.whatwg.org/" : "Fetch",
   "https://www.w3.org/TR/hr-time/" : "HighResolutionTime",
+  "https://html.spec.whatwg.org/multipage/workers.html" : "Workers",
 };
 /**
  * @returns {undefined}
