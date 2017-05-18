@@ -28,7 +28,8 @@ function isDefined(obj) {
  * @param {boolean} condition
  * @param {Object} [obj]
  */
-function assert(condition, obj) {
+function assert(condition) {
+  let obj = Array.prototype.slice.call(arguments, 1);
   assert_ext(condition, `${YELLOW}${JSON.stringify(obj)}${RESET}`);
 }
 
@@ -202,6 +203,12 @@ function getTypeInDoc(type) {
     assert(type.generic === null);
     assert((typeof(type['default']) === 'undefined'));
     doc += getTypeInDoc(type.idlType) + '[]';
+  } else if (type.generic === 'FrozenArray') {
+    assert(!type.array);
+    assert(!type.sequence);
+    assert(!type.union);
+    assert((typeof(type['default']) === 'undefined'));
+    doc += getTypeInDoc(type.idlType) + '[]';
   } else if (type.sequence) {
     assert(!type.array, type);
     assert(!type.union);
@@ -357,6 +364,11 @@ function convertInterfaceAttribute(interface_name, member) {
       case 'Replaceable': {
         assert(attr.arguments === null);
         doc_lines.push(`[Replaceable] -- This readonly value is a property of prototype. But assign to it can create this object's own property.`);
+        break;
+      }
+      case 'SecureContext': {
+        assert(attr.arguments === null);
+        doc_lines.push(`[SecureContext] -- This value requires a secure context.`);
         break;
       }
       default: {
@@ -658,6 +670,11 @@ function getInterfaceConfig(extAttrs) {
           "in an ECMAScript environment, and that the structure of the prototype chain and " +
           "how properties corresponding to interface members will be reflected on the prototype objects " +
           "will be different from other interfaces.");
+        break;
+      }
+      case 'SecureContext': {
+        assert(attr.arguments === null);
+        config.attr_doc_lines.push(`[SecureContext]`);
         break;
       }
       default: {
@@ -1051,6 +1068,7 @@ const URL_TO_IDL = {
   "https://fetch.spec.whatwg.org/" : "Fetch",
   "https://www.w3.org/TR/hr-time/" : "HighResolutionTime",
   "https://html.spec.whatwg.org/multipage/workers.html" : "Workers",
+  "https://www.w3.org/TR/service-workers-1/" : "ServiceWorkers",
 };
 /**
  * @returns {undefined}
