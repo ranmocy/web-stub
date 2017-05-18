@@ -714,7 +714,8 @@ ExtendableMessageEvent.prototype.ports = null;
  *   [SecureContext, SameObject] readonly attribute CacheStorage caches;
  * };
  */
-
+Window.prototype = WindowOrWorkerGlobalScope.prototype;
+Worker.prototype = WindowOrWorkerGlobalScope.prototype;
 
 /**
  * [SecureContext] -- This value requires a secure context.

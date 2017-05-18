@@ -692,6 +692,12 @@ function getInterfaceConfig(extAttrs) {
  */
 function getInterfaceConstructorAndInheritance(definition) {
   if (definition.partial) {
+    if (definition.name === 'WindowOrWorkerGlobalScope') {
+      return [
+        `Window.prototype = ${definition.name}.prototype;`,
+        `Worker.prototype = ${definition.name}.prototype;`,
+      ].join("\n");
+    }
     return "";
   }
 

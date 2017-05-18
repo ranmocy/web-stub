@@ -494,7 +494,8 @@ Response.prototype = Body.prototype;
  *   [NewObject] Promise<Response> fetch(RequestInfo input, optional RequestInit init);
  * };
  */
-
+Window.prototype = WindowOrWorkerGlobalScope.prototype;
+Worker.prototype = WindowOrWorkerGlobalScope.prototype;
 
 /**
  * [NewObject] -- Always returns new object.
