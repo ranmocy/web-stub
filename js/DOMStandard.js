@@ -977,10 +977,10 @@ Node.prototype.nodeType = 0;
 Node.prototype.nodeName = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Node.prototype.baseURI = new USVString();
+Node.prototype.baseURI = "";
 
 /**
  * @type {boolean}
@@ -1239,22 +1239,22 @@ Window.prototype.Document = Document;
 Document.prototype.implementation = new DOMImplementation();
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Document.prototype.URL = new USVString();
+Document.prototype.URL = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Document.prototype.documentURI = new USVString();
+Document.prototype.documentURI = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Document.prototype.origin = new USVString();
+Document.prototype.origin = "";
 
 /**
  * @type {string}

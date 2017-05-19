@@ -18,10 +18,10 @@ Window.prototype.ServiceWorker = ServiceWorker;
 Worker.prototype.ServiceWorker = ServiceWorker;
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-ServiceWorker.prototype.scriptURL = new USVString();
+ServiceWorker.prototype.scriptURL = "";
 
 /**
  * @type {ServiceWorkerState}
@@ -106,10 +106,10 @@ ServiceWorkerRegistration.prototype.waiting = null;
 ServiceWorkerRegistration.prototype.active = null;
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-ServiceWorkerRegistration.prototype.scope = new USVString();
+ServiceWorkerRegistration.prototype.scope = "";
 
 /**
  * [NewObject] -- Always returns new object.
@@ -199,7 +199,7 @@ ServiceWorkerContainer.prototype.ready = new ServiceWorkerRegistration();
 
 /**
  * [NewObject] -- Always returns new object.
- * @param {USVString} scriptURL
+ * @param {string} scriptURL
  * @param {RegistrationOptions} [options]
  * @returns {Promise.<ServiceWorkerRegistration>}
  */
@@ -207,7 +207,7 @@ ServiceWorkerContainer.prototype.register = function (scriptURL, options) { retu
 
 /**
  * [NewObject] -- Always returns new object.
- * @param {USVString} [clientURL='']
+ * @param {string} [clientURL='']
  * @returns {Promise.<*>}
  */
 ServiceWorkerContainer.prototype.getRegistration = function (clientURL) { return {}; };
@@ -242,7 +242,7 @@ ServiceWorkerContainer.prototype.onmessage = new EventHandler();
  */
 /**
  * @typedef {Object} RegistrationOptions
- * @property {USVString} [scope]
+ * @property {string} [scope]
  * @property {WorkerType} [type='classic']
  */
 
@@ -398,10 +398,10 @@ let Client = function () {};
 ServiceWorker.prototype.Client = Client;
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Client.prototype.url = new USVString();
+Client.prototype.url = "";
 
 /**
  * @type {FrameType}
@@ -459,7 +459,7 @@ WindowClient.prototype.focus = function () { return new WindowClient(); };
 
 /**
  * [NewObject] -- Always returns new object.
- * @param {USVString} url
+ * @param {string} url
  * @returns {Promise.<WindowClient>}
  */
 WindowClient.prototype.navigate = function (url) { return new WindowClient(); };
@@ -510,7 +510,7 @@ Clients.prototype.matchAll = function (options) { return [new Client()]; };
 
 /**
  * [NewObject] -- Always returns new object.
- * @param {USVString} url
+ * @param {string} url
  * @returns {Promise.<?WindowClient>}
  */
 Clients.prototype.openWindow = function (url) { return null; };

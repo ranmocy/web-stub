@@ -39,7 +39,7 @@ WorkerGlobalScope.prototype.location = new WorkerLocation();
 WorkerGlobalScope.prototype.navigator = new WorkerNavigator();
 
 /**
- * @param {...USVString} urls
+ * @param {...string} urls
  * @returns {void}
  */
 WorkerGlobalScope.prototype.importScripts = function (urls) { return ; };
@@ -185,7 +185,7 @@ AbstractWorker.prototype.onerror = new EventHandler();
  */
 /**
  * @constructor
- * @param {USVString} scriptURL
+ * @param {string} scriptURL
  * @param {WorkerOptions} [options]
  */
 let Worker = function (scriptURL, options) {};
@@ -257,7 +257,7 @@ Worker.prototype = AbstractWorker.prototype;
  */
 /**
  * @constructor
- * @param {USVString} scriptURL
+ * @param {string} scriptURL
  * @param {(string|WorkerOptions)} [options]
  */
 let SharedWorker = function (scriptURL, options) {};
@@ -370,57 +370,57 @@ Worker.prototype.WorkerLocation = WorkerLocation;
 
 /**
  * [stringifier]
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.href = new USVString();
+WorkerLocation.prototype.href = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.origin = new USVString();
+WorkerLocation.prototype.origin = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.protocol = new USVString();
+WorkerLocation.prototype.protocol = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.host = new USVString();
+WorkerLocation.prototype.host = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.hostname = new USVString();
+WorkerLocation.prototype.hostname = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.port = new USVString();
+WorkerLocation.prototype.port = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.pathname = new USVString();
+WorkerLocation.prototype.pathname = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.search = new USVString();
+WorkerLocation.prototype.search = "";
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-WorkerLocation.prototype.hash = new USVString();
+WorkerLocation.prototype.hash = "";
 
 

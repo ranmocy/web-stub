@@ -92,6 +92,7 @@ function getDefaultValueObj(idlType) {
     case 'boolean':
       return false;
     case 'DOMString':
+    case 'USVString':
       return '""';
     default:
       return `new ${idlType}()`;
@@ -174,6 +175,7 @@ function getTypePlainName(idlType) {
     case 'unsigned long long':
       return 'number';
     case 'DOMString':
+    case 'USVString':
       return 'string';
     default:
       return idlType;

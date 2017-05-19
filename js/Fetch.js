@@ -83,7 +83,7 @@ Headers.prototype[Symbol.iterator] = function* () { yield [new ByteString(), new
  * typedef (Blob or BufferSource or FormData or URLSearchParams or ReadableStream or USVString) BodyInit;
  */
 /**
- * @typedef {(Blob|BufferSource|FormData|URLSearchParams|ReadableStream|USVString)} BodyInit
+ * @typedef {(Blob|BufferSource|FormData|URLSearchParams|ReadableStream|string)} BodyInit
  */
 
 
@@ -144,16 +144,16 @@ Body.prototype.json = function () { return {}; };
 
 /**
  * [NewObject] -- Always returns new object.
- * @returns {Promise.<USVString>}
+ * @returns {Promise.<string>}
  */
-Body.prototype.text = function () { return new USVString(); };
+Body.prototype.text = function () { return ""; };
 
 
 /**
  * typedef (Request or USVString) RequestInfo;
  */
 /**
- * @typedef {(Request|USVString)} RequestInfo
+ * @typedef {(Request|string)} RequestInfo
  */
 
 
@@ -193,10 +193,10 @@ Worker.prototype.Request = Request;
 Request.prototype.method = new ByteString();
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Request.prototype.url = new USVString();
+Request.prototype.url = "";
 
 /**
  * [SameObject] -- It will always return the same object
@@ -218,10 +218,10 @@ Request.prototype.type = new RequestType();
 Request.prototype.destination = new RequestDestination();
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Request.prototype.referrer = new USVString();
+Request.prototype.referrer = "";
 
 /**
  * @type {ReferrerPolicy}
@@ -302,7 +302,7 @@ Request.prototype = Body.prototype;
  * @property {ByteString} [method]
  * @property {HeadersInit} [headers]
  * @property {?BodyInit} [body]
- * @property {USVString} [referrer]
+ * @property {string} [referrer]
  * @property {ReferrerPolicy} [referrerPolicy]
  * @property {RequestMode} [mode]
  * @property {RequestCredentials} [credentials]
@@ -395,7 +395,7 @@ Response.error = function () { return new Response(); };
 
 /**
  * [NewObject] -- Always returns new object.
- * @param {USVString} url
+ * @param {string} url
  * @param {number} [status=302]
  * @returns {Response}
  */
@@ -408,10 +408,10 @@ Response.redirect = function (url, status) { return new Response(); };
 Response.prototype.type = new ResponseType();
 
 /**
- * @type {USVString}
+ * @type {string}
  * @readonly
  */
-Response.prototype.url = new USVString();
+Response.prototype.url = "";
 
 /**
  * @type {boolean}
